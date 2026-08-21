@@ -418,3 +418,224 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## Test case 9: Delete the first, last, and only task
+
+Aim: Verify that deleting tasks at different positions reindexes the remaining
+tasks and that deleting the final task leaves an empty list.
+
+Inputs:
+```text
+todo first task
+deadline middle task /by Friday
+event last task /at Monday
+mark 2
+delete 1
+delete 2
+list
+delete 1
+list
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] first task
+____________________________________________________________
+____________________________________________________________
+added: [D][ ] middle task (by: Friday)
+____________________________________________________________
+____________________________________________________________
+added: [E][ ] last task (at: Monday)
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [D][X] middle task (by: Friday)
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [T][ ] first task
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [E][ ] last task (at: Monday)
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[D][X] middle task (by: Friday)
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [D][X] middle task (by: Friday)
+Now you have 0 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 10: Reject malformed delete indexes
+
+Aim: Verify that alphabetic, decimal, and negative delete indexes are rejected,
+while a whitespace-padded valid index still works.
+
+Inputs:
+```text
+todo read book
+delete abc
+delete 1.5
+delete -1
+delete   1
+list
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] read book
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Please provide a valid task number between 1 and 1.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Please provide a valid task number between 1 and 1.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Please provide a valid task number between 1 and 1.
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [T][ ] read book
+Now you have 0 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 11: Reject empty deadline and event descriptions
+
+Aim: Verify that deadline and event commands with empty descriptions do not
+change the list and that a valid task can still be added afterward.
+
+Inputs:
+```text
+deadline /by Friday
+event /at Monday
+list
+todo valid task
+list
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+OOPS!!! The description of a deadline cannot be empty.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! The description of a event cannot be empty.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] valid task
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] valid task
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 12: Keep duplicate descriptions independent
+
+Aim: Verify that duplicate task descriptions are stored as separate objects
+and that deleting a completed duplicate does not change the remaining one.
+
+Inputs:
+```text
+todo read book
+todo read book
+mark 1
+delete 1
+list
+unmark 1
+list
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] read book
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] read book
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] read book
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [T][X] read book
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+____________________________________________________________
+____________________________________________________________
+Okay, I've marked this task as not done yet:
+  [T][ ] read book
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
