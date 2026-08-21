@@ -36,21 +36,32 @@ public class Duchess {
 
             System.out.println(separator);
 
-            if (command.equalsIgnoreCase("list")) {
-                System.out.println("Here are the tasks in your list:");
-                for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + "." + tasks[i]);
+            try {
+                if (command.equalsIgnoreCase("list")) {
+                    System.out.println("Here are the tasks in your list:");
+                    for (int i = 0; i < taskCount; i++) {
+                        System.out.println((i + 1) + "." + tasks[i]);
+                    }
+                } else if (command.toLowerCase().startsWith("mark ")) {
+                    markTask(command, tasks, taskCount);
+                } else if (command.toLowerCase().startsWith("unmark ")) {
+                    unmarkTask(command, tasks, taskCount);
+                } else if (command.equalsIgnoreCase("mark")) {
+                    throw new DuchessException("OOPS!!! Please use 'mark <task number>', "
+                            + "for example: mark 1.");
+                } else if (command.equalsIgnoreCase("unmark")) {
+                    throw new DuchessException("OOPS!!! Please use 'unmark <task number>', "
+                            + "for example: unmark 1.");
+                } else if (taskCount < MAX_TASKS) {
+                    tasks[taskCount] = createTask(command);
+                    taskCount++;
+                    System.out.println("added: " + tasks[taskCount - 1]);
+                } else {
+                    throw new DuchessException("OOPS!!! Your task list is full. "
+                            + "You cannot store more than " + MAX_TASKS + " tasks.");
                 }
-            } else if (command.toLowerCase().startsWith("mark ")) {
-                markTask(command, tasks, taskCount);
-            } else if (command.toLowerCase().startsWith("unmark ")) {
-                unmarkTask(command, tasks, taskCount);
-            } else if (taskCount < MAX_TASKS) {
-                tasks[taskCount] = createTask(command);
-                taskCount++;
-                System.out.println("added: " + tasks[taskCount - 1]);
-            } else {
-                System.out.println("Sorry, I cannot store more than " + MAX_TASKS + " tasks.");
+            } catch (DuchessException exception) {
+                System.out.println(exception.getMessage());
             }
 
             System.out.println(separator);
@@ -64,22 +75,35 @@ public class Duchess {
      * existing plain task input remains supported.</p>
      *
      * @param command the complete task command
+     * @throws DuchessException if the command is empty, malformed, or unknown
      * @return a task object whose runtime type matches the command
      */
-    private static Task createTask(String command) {
+    private static Task createTask(String command) throws DuchessException {
         String lowerCaseCommand = command.toLowerCase();
-        if (lowerCaseCommand.startsWith("todo ")) {
-            return new Todo(command.substring("todo ".length()).trim());
+        if (command.trim().isEmpty()) {
+            throw new DuchessException("OOPS!!! A command cannot be empty. "
+                    + "Try todo, deadline, event, list, mark, unmark, or bye.");
         }
-        if (lowerCaseCommand.startsWith("deadline ")) {
-            String[] details = splitTaskDetails(command.substring("deadline ".length()), "/by");
+        if (lowerCaseCommand.equals("todo") || lowerCaseCommand.startsWith("todo ")) {
+            String description = command.substring("todo".length()).trim();
+            if (description.isEmpty()) {
+                throw new DuchessException("OOPS!!! The description of a todo cannot be empty.");
+            }
+            return new Todo(description);
+        }
+        if (lowerCaseCommand.equals("deadline") || lowerCaseCommand.startsWith("deadline ")) {
+            String[] details = splitTaskDetails(command.substring("deadline".length()), "/by");
+            validateTaskDetails("deadline", details, "/by");
             return new Deadline(details[0], details[1]);
         }
-        if (lowerCaseCommand.startsWith("event ")) {
-            String[] details = splitTaskDetails(command.substring("event ".length()), "/at");
+        if (lowerCaseCommand.equals("event") || lowerCaseCommand.startsWith("event ")) {
+            String[] details = splitTaskDetails(command.substring("event".length()), "/at");
+            validateTaskDetails("event", details, "/at");
             return new Event(details[0], details[1]);
         }
-        return new Todo(command);
+
+        throw new DuchessException("OOPS!!! I'm sorry, but I don't know what that means :-(\n"
+                + "Try todo, deadline, event, list, mark, unmark, or bye.");
     }
 
     /**
@@ -101,18 +125,39 @@ public class Duchess {
     }
 
     /**
+     * Checks that a deadline or event has both required pieces of information.
+     *
+     * @param taskType the task type being validated
+     * @param details the parsed description and detail
+     * @param marker the required detail marker
+     * @throws DuchessException if the description or detail is missing
+     */
+    private static void validateTaskDetails(String taskType, String[] details, String marker)
+            throws DuchessException {
+        if (details[0].isEmpty()) {
+            throw new DuchessException("OOPS!!! The description of a " + taskType
+                    + " cannot be empty.");
+        }
+        if (details[1].isEmpty()) {
+            String article = taskType.equals("event") ? "An" : "A";
+            throw new DuchessException("OOPS!!! " + article + " " + taskType
+                    + " must include a non-empty "
+                    + marker + " value. Example: " + taskType + " task description "
+                    + marker + " time.");
+        }
+    }
+
+    /**
      * Marks the task identified by a one-based index as done.
      *
      * @param command the complete mark command entered by the user
      * @param tasks the stored tasks
      * @param taskCount the number of stored tasks
      */
-    private static void markTask(String command, Task[] tasks, int taskCount) {
+    private static void markTask(String command, Task[] tasks, int taskCount)
+            throws DuchessException {
         int taskIndex = parseTaskIndex(command, "mark ");
-        if (taskIndex < 0 || taskIndex >= taskCount) {
-            printInvalidTaskNumber(taskCount);
-            return;
-        }
+        validateTaskIndex(taskIndex, taskCount);
 
         tasks[taskIndex].markAsDone();
         System.out.println("Nice! I've marked this task as done:");
@@ -126,12 +171,10 @@ public class Duchess {
      * @param tasks the stored tasks
      * @param taskCount the number of stored tasks
      */
-    private static void unmarkTask(String command, Task[] tasks, int taskCount) {
+    private static void unmarkTask(String command, Task[] tasks, int taskCount)
+            throws DuchessException {
         int taskIndex = parseTaskIndex(command, "unmark ");
-        if (taskIndex < 0 || taskIndex >= taskCount) {
-            printInvalidTaskNumber(taskCount);
-            return;
-        }
+        validateTaskIndex(taskIndex, taskCount);
 
         tasks[taskIndex].markAsNotDone();
         System.out.println("Okay, I've marked this task as not done yet:");
@@ -159,7 +202,10 @@ public class Duchess {
      *
      * @param taskCount the number of stored tasks
      */
-    private static void printInvalidTaskNumber(int taskCount) {
-        System.out.println("Please provide a task number between 1 and " + taskCount + ".");
+    private static void validateTaskIndex(int taskIndex, int taskCount) throws DuchessException {
+        if (taskIndex < 0 || taskIndex >= taskCount) {
+            throw new DuchessException("OOPS!!! Please provide a valid task number between 1 and "
+                    + taskCount + ".");
+        }
     }
 }
