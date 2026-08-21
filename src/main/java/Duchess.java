@@ -1,11 +1,10 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
  * The main entry point for the Duchess chatbot.
  */
 public class Duchess {
-    private static final int MAX_TASKS = 100;
-
     public static void main(String[] args) {
         String separator = "____________________________________________________________";
         String banner = """
@@ -21,8 +20,7 @@ public class Duchess {
         System.out.println(separator);
 
         Scanner scanner = new Scanner(System.in);
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -39,26 +37,27 @@ public class Duchess {
             try {
                 if (command.equalsIgnoreCase("list")) {
                     System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + "." + tasks[i]);
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println((i + 1) + "." + tasks.get(i));
                     }
                 } else if (command.toLowerCase().startsWith("mark ")) {
-                    markTask(command, tasks, taskCount);
+                    markTask(command, tasks);
                 } else if (command.toLowerCase().startsWith("unmark ")) {
-                    unmarkTask(command, tasks, taskCount);
+                    unmarkTask(command, tasks);
+                } else if (command.toLowerCase().startsWith("delete ")) {
+                    deleteTask(command, tasks);
                 } else if (command.equalsIgnoreCase("mark")) {
                     throw new DuchessException("OOPS!!! Please use 'mark <task number>', "
                             + "for example: mark 1.");
                 } else if (command.equalsIgnoreCase("unmark")) {
                     throw new DuchessException("OOPS!!! Please use 'unmark <task number>', "
                             + "for example: unmark 1.");
-                } else if (taskCount < MAX_TASKS) {
-                    tasks[taskCount] = createTask(command);
-                    taskCount++;
-                    System.out.println("added: " + tasks[taskCount - 1]);
+                } else if (command.equalsIgnoreCase("delete")) {
+                    throw new DuchessException("OOPS!!! Please use 'delete <task number>', "
+                            + "for example: delete 1.");
                 } else {
-                    throw new DuchessException("OOPS!!! Your task list is full. "
-                            + "You cannot store more than " + MAX_TASKS + " tasks.");
+                    tasks.add(createTask(command));
+                    System.out.println("added: " + tasks.get(tasks.size() - 1));
                 }
             } catch (DuchessException exception) {
                 System.out.println(exception.getMessage());
@@ -82,7 +81,7 @@ public class Duchess {
         String lowerCaseCommand = command.toLowerCase();
         if (command.trim().isEmpty()) {
             throw new DuchessException("OOPS!!! A command cannot be empty. "
-                    + "Try todo, deadline, event, list, mark, unmark, or bye.");
+                    + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
         }
         if (lowerCaseCommand.equals("todo") || lowerCaseCommand.startsWith("todo ")) {
             String description = command.substring("todo".length()).trim();
@@ -103,7 +102,7 @@ public class Duchess {
         }
 
         throw new DuchessException("OOPS!!! I'm sorry, but I don't know what that means :-(\n"
-                + "Try todo, deadline, event, list, mark, unmark, or bye.");
+                + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
     }
 
     /**
@@ -152,16 +151,15 @@ public class Duchess {
      *
      * @param command the complete mark command entered by the user
      * @param tasks the stored tasks
-     * @param taskCount the number of stored tasks
      */
-    private static void markTask(String command, Task[] tasks, int taskCount)
+    private static void markTask(String command, ArrayList<Task> tasks)
             throws DuchessException {
         int taskIndex = parseTaskIndex(command, "mark ");
-        validateTaskIndex(taskIndex, taskCount);
+        validateTaskIndex(taskIndex, tasks.size());
 
-        tasks[taskIndex].markAsDone();
+        tasks.get(taskIndex).markAsDone();
         System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + tasks[taskIndex]);
+        System.out.println("  " + tasks.get(taskIndex));
     }
 
     /**
@@ -169,20 +167,37 @@ public class Duchess {
      *
      * @param command the complete unmark command entered by the user
      * @param tasks the stored tasks
-     * @param taskCount the number of stored tasks
      */
-    private static void unmarkTask(String command, Task[] tasks, int taskCount)
+    private static void unmarkTask(String command, ArrayList<Task> tasks)
             throws DuchessException {
         int taskIndex = parseTaskIndex(command, "unmark ");
-        validateTaskIndex(taskIndex, taskCount);
+        validateTaskIndex(taskIndex, tasks.size());
 
-        tasks[taskIndex].markAsNotDone();
+        tasks.get(taskIndex).markAsNotDone();
         System.out.println("Okay, I've marked this task as not done yet:");
-        System.out.println("  " + tasks[taskIndex]);
+        System.out.println("  " + tasks.get(taskIndex));
     }
 
     /**
-     * Converts the one-based task number in a command into a zero-based array index.
+     * Deletes the task identified by a one-based index.
+     *
+     * @param command the complete delete command entered by the user
+     * @param tasks the stored tasks
+     * @throws DuchessException if the task number is invalid
+     */
+    private static void deleteTask(String command, ArrayList<Task> tasks)
+            throws DuchessException {
+        int taskIndex = parseTaskIndex(command, "delete ");
+        validateTaskIndex(taskIndex, tasks.size());
+
+        Task deletedTask = tasks.remove(taskIndex);
+        System.out.println("Noted. I've removed this task:");
+        System.out.println("  " + deletedTask);
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+    }
+
+    /**
+     * Converts the one-based task number in a command into a zero-based list index.
      *
      * @param command the complete command
      * @param prefix the command prefix, such as {@code "mark "}
@@ -198,9 +213,11 @@ public class Duchess {
     }
 
     /**
-     * Displays a consistent message when a command refers to no stored task.
+     * Checks that a command refers to a stored task.
      *
+     * @param taskIndex the zero-based task index
      * @param taskCount the number of stored tasks
+     * @throws DuchessException if the task index is outside the list
      */
     private static void validateTaskIndex(int taskIndex, int taskCount) throws DuchessException {
         if (taskIndex < 0 || taskIndex >= taskCount) {
