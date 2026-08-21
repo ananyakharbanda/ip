@@ -45,4 +45,14 @@ public class Task {
     public void markAsNotDone() {
         isDone = false;
     }
+
+    /**
+     * Returns the common task display, including its completion status.
+     *
+     * @return the status icon followed by the task description
+     */
+    @Override
+    public String toString() {
+        return "[" + getStatusIcon() + "] " + description;
+    }
 }

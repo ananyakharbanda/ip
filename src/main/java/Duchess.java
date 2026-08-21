@@ -39,23 +39,65 @@ public class Duchess {
             if (command.equalsIgnoreCase("list")) {
                 System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + ".[" + tasks[i].getStatusIcon() + "] "
-                            + tasks[i].getDescription());
+                    System.out.println((i + 1) + "." + tasks[i]);
                 }
             } else if (command.toLowerCase().startsWith("mark ")) {
                 markTask(command, tasks, taskCount);
             } else if (command.toLowerCase().startsWith("unmark ")) {
                 unmarkTask(command, tasks, taskCount);
             } else if (taskCount < MAX_TASKS) {
-                tasks[taskCount] = new Task(command);
+                tasks[taskCount] = createTask(command);
                 taskCount++;
-                System.out.println("added: " + command);
+                System.out.println("added: " + tasks[taskCount - 1]);
             } else {
                 System.out.println("Sorry, I cannot store more than " + MAX_TASKS + " tasks.");
             }
 
             System.out.println(separator);
         }
+    }
+
+    /**
+     * Creates the appropriate task subtype from a user command.
+     *
+     * <p>Commands without an explicit type are treated as todo tasks so that
+     * existing plain task input remains supported.</p>
+     *
+     * @param command the complete task command
+     * @return a task object whose runtime type matches the command
+     */
+    private static Task createTask(String command) {
+        String lowerCaseCommand = command.toLowerCase();
+        if (lowerCaseCommand.startsWith("todo ")) {
+            return new Todo(command.substring("todo ".length()).trim());
+        }
+        if (lowerCaseCommand.startsWith("deadline ")) {
+            String[] details = splitTaskDetails(command.substring("deadline ".length()), "/by");
+            return new Deadline(details[0], details[1]);
+        }
+        if (lowerCaseCommand.startsWith("event ")) {
+            String[] details = splitTaskDetails(command.substring("event ".length()), "/at");
+            return new Event(details[0], details[1]);
+        }
+        return new Todo(command);
+    }
+
+    /**
+     * Splits a typed task command into its description and detail value.
+     *
+     * @param taskDetails the text after the task type
+     * @param marker the detail marker, such as {@code /by} or {@code /at}
+     * @return a two-element array containing description and detail
+     */
+    private static String[] splitTaskDetails(String taskDetails, String marker) {
+        int markerIndex = taskDetails.toLowerCase().indexOf(marker.toLowerCase());
+        if (markerIndex < 0) {
+            return new String[]{taskDetails.trim(), ""};
+        }
+
+        String description = taskDetails.substring(0, markerIndex).trim();
+        String detail = taskDetails.substring(markerIndex + marker.length()).trim();
+        return new String[]{description, detail};
     }
 
     /**
@@ -74,8 +116,7 @@ public class Duchess {
 
         tasks[taskIndex].markAsDone();
         System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  [" + tasks[taskIndex].getStatusIcon() + "] "
-                + tasks[taskIndex].getDescription());
+        System.out.println("  " + tasks[taskIndex]);
     }
 
     /**
@@ -94,8 +135,7 @@ public class Duchess {
 
         tasks[taskIndex].markAsNotDone();
         System.out.println("Okay, I've marked this task as not done yet:");
-        System.out.println("  [" + tasks[taskIndex].getStatusIcon() + "] "
-                + tasks[taskIndex].getDescription());
+        System.out.println("  " + tasks[taskIndex]);
     }
 
     /**

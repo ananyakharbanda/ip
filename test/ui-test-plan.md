@@ -5,16 +5,16 @@ into a temporary directory before starting each test case in a fresh process.
 
 Run command: `java -cp {classes} Duchess`
 
-## Test case 1: Mark a task as done
+## Test case 1: Create and mark multiple task types
 
-Aim: Verify that `mark N` marks the selected task as done and that `list`
-displays `[X]` for that task while leaving other tasks unfinished.
+Aim: Verify that `todo`, `deadline`, and `event` commands create different
+subtypes stored together, and that `mark N` works polymorphically.
 
 Inputs:
 ```text
-read book
-return book
-buy bread
+todo read book
+deadline return book /by Sunday
+event buy bread /at Saturday
 mark 2
 list
 bye
@@ -30,23 +30,23 @@ Hello! I'm Duchess.
 What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
-added: read book
+added: [T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
-added: return book
+added: [D][ ] return book (by: Sunday)
 ____________________________________________________________
 ____________________________________________________________
-added: buy bread
+added: [E][ ] buy bread (at: Saturday)
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [X] return book
+  [D][X] return book (by: Sunday)
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
-1.[ ] read book
-2.[X] return book
-3.[ ] buy bread
+1.[T][ ] read book
+2.[D][X] return book (by: Sunday)
+3.[E][ ] buy bread (at: Saturday)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
@@ -59,7 +59,7 @@ Aim: Verify that `unmark N` changes a completed task back to unfinished.
 
 Inputs:
 ```text
-read book
+todo read book
 mark 1
 unmark 1
 list
@@ -76,19 +76,19 @@ Hello! I'm Duchess.
 What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
-added: read book
+added: [T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [X] read book
+  [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
 Okay, I've marked this task as not done yet:
-  [ ] read book
+  [T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
-1.[ ] read book
+1.[T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
