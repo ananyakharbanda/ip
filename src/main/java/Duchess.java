@@ -21,8 +21,7 @@ public class Duchess {
         System.out.println(separator);
 
         Scanner scanner = new Scanner(System.in);
-        String[] tasks = new String[MAX_TASKS];
-        boolean[] completed = new boolean[MAX_TASKS];
+        Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
 
         while (scanner.hasNextLine()) {
@@ -40,15 +39,15 @@ public class Duchess {
             if (command.equalsIgnoreCase("list")) {
                 System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
-                    String status = completed[i] ? "[X]" : "[ ]";
-                    System.out.println((i + 1) + "." + status + " " + tasks[i]);
+                    System.out.println((i + 1) + ".[" + tasks[i].getStatusIcon() + "] "
+                            + tasks[i].getDescription());
                 }
             } else if (command.toLowerCase().startsWith("mark ")) {
-                markTask(command, tasks, completed, taskCount);
+                markTask(command, tasks, taskCount);
             } else if (command.toLowerCase().startsWith("unmark ")) {
-                unmarkTask(command, tasks, completed, taskCount);
+                unmarkTask(command, tasks, taskCount);
             } else if (taskCount < MAX_TASKS) {
-                tasks[taskCount] = command;
+                tasks[taskCount] = new Task(command);
                 taskCount++;
                 System.out.println("added: " + command);
             } else {
@@ -63,40 +62,40 @@ public class Duchess {
      * Marks the task identified by a one-based index as done.
      *
      * @param command the complete mark command entered by the user
-     * @param tasks the stored task descriptions
-     * @param completed the completion status for each stored task
+     * @param tasks the stored tasks
      * @param taskCount the number of stored tasks
      */
-    private static void markTask(String command, String[] tasks, boolean[] completed, int taskCount) {
+    private static void markTask(String command, Task[] tasks, int taskCount) {
         int taskIndex = parseTaskIndex(command, "mark ");
         if (taskIndex < 0 || taskIndex >= taskCount) {
             printInvalidTaskNumber(taskCount);
             return;
         }
 
-        completed[taskIndex] = true;
+        tasks[taskIndex].markAsDone();
         System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  [X] " + tasks[taskIndex]);
+        System.out.println("  [" + tasks[taskIndex].getStatusIcon() + "] "
+                + tasks[taskIndex].getDescription());
     }
 
     /**
      * Marks the task identified by a one-based index as not done.
      *
      * @param command the complete unmark command entered by the user
-     * @param tasks the stored task descriptions
-     * @param completed the completion status for each stored task
+     * @param tasks the stored tasks
      * @param taskCount the number of stored tasks
      */
-    private static void unmarkTask(String command, String[] tasks, boolean[] completed, int taskCount) {
+    private static void unmarkTask(String command, Task[] tasks, int taskCount) {
         int taskIndex = parseTaskIndex(command, "unmark ");
         if (taskIndex < 0 || taskIndex >= taskCount) {
             printInvalidTaskNumber(taskCount);
             return;
         }
 
-        completed[taskIndex] = false;
+        tasks[taskIndex].markAsNotDone();
         System.out.println("Okay, I've marked this task as not done yet:");
-        System.out.println("  [ ] " + tasks[taskIndex]);
+        System.out.println("  [" + tasks[taskIndex].getStatusIcon() + "] "
+                + tasks[taskIndex].getDescription());
     }
 
     /**
