@@ -12,7 +12,7 @@ public class Event extends Task {
      * @param at the event time
      */
     public Event(String description, String at) {
-        super(description);
+        super(description, TaskType.EVENT);
         this.at = at;
     }
 
@@ -23,6 +23,6 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (at: " + at + ")";
+        return super.toString() + " (at: " + at + ")";
     }
 }

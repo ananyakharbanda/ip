@@ -8,14 +8,28 @@ public class Task {
     /** Whether this task has been marked as done. */
     protected boolean isDone;
 
+    /** The category used when displaying this task. */
+    protected TaskType type;
+
     /**
      * Creates a new, unfinished task.
      *
      * @param description the text entered by the user
      */
     public Task(String description) {
+        this(description, TaskType.TODO);
+    }
+
+    /**
+     * Creates a new task with a specified category.
+     *
+     * @param description the text entered by the user
+     * @param type the task category
+     */
+    public Task(String description, TaskType type) {
         this.description = description;
         this.isDone = false;
+        this.type = type;
     }
 
     /**
@@ -25,6 +39,15 @@ public class Task {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Returns this task's category.
+     *
+     * @return the task category
+     */
+    public TaskType getType() {
+        return type;
     }
 
     /**
@@ -53,6 +76,6 @@ public class Task {
      */
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + type.getIcon() + "][" + getStatusIcon() + "] " + description;
     }
 }
