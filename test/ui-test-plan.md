@@ -53,15 +53,21 @@ Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-## Test case 2: Handle empty and unknown commands
+## Test case 2: Preserve state after invalid commands
 
-Aim: Verify that an empty todo description and an unknown command produce
-specific error messages without terminating the session.
+Aim: Verify that invalid commands do not add or modify tasks, and that valid
+commands still work afterward.
 
 Inputs:
 ```text
+todo read book
 todo
 blah
+deadline report
+mark 2
+list
+event meeting /at Monday
+list
 bye
 ```
 
@@ -75,6 +81,9 @@ Hello! I'm Duchess.
 What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
+added: [T][ ] read book
+____________________________________________________________
+____________________________________________________________
 OOPS!!! The description of a todo cannot be empty.
 ____________________________________________________________
 ____________________________________________________________
@@ -82,20 +91,90 @@ OOPS!!! I'm sorry, but I don't know what that means :-(
 Try todo, deadline, event, list, mark, unmark, or bye.
 ____________________________________________________________
 ____________________________________________________________
+OOPS!!! A deadline must include a non-empty /by value. Example: deadline task description /by time.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Please provide a valid task number between 1 and 1.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+____________________________________________________________
+____________________________________________________________
+added: [E][ ] meeting (at: Monday)
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+2.[E][ ] meeting (at: Monday)
+____________________________________________________________
+____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-## Test case 3: Handle malformed details and invalid task numbers
+## Test case 3: Accept case-insensitive typed commands
 
-Aim: Verify that deadline and event details, as well as task numbers, produce
-specific correction messages when they are invalid.
+Aim: Verify that task types and control commands work regardless of letter
+case and still produce the correct polymorphic state.
+
+Inputs:
+```text
+TODO   read book
+DEADLINE report /BY Friday
+EVENT meeting /AT Monday
+MARK 2
+LIST
+BYE
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] read book
+____________________________________________________________
+____________________________________________________________
+added: [D][ ] report (by: Friday)
+____________________________________________________________
+____________________________________________________________
+added: [E][ ] meeting (at: Monday)
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [D][X] report (by: Friday)
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+2.[D][X] report (by: Friday)
+3.[E][ ] meeting (at: Monday)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 4: Reject malformed details and task numbers
+
+Aim: Verify that malformed deadline/event commands and invalid mark commands
+leave the task list empty and the session usable.
 
 Inputs:
 ```text
 deadline project
 event meeting
 mark 1
+unmark 0
+mark
+unmark
+list
 bye
 ```
 
@@ -118,11 +197,23 @@ ____________________________________________________________
 OOPS!!! Please provide a valid task number between 1 and 0.
 ____________________________________________________________
 ____________________________________________________________
+OOPS!!! Please provide a valid task number between 1 and 0.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Please use 'mark <task number>', for example: mark 1.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Please use 'unmark <task number>', for example: unmark 1.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+____________________________________________________________
+____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-## Test case 4: Unmark a completed task
+## Test case 5: Mark and unmark a task
 
 Aim: Verify that `unmark N` changes a completed task back to unfinished.
 
@@ -158,6 +249,47 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 6: Recover from blank input and whitespace-only tasks
+
+Aim: Verify that blank input and whitespace-only descriptions are rejected,
+then a valid task can still be added and listed.
+
+Inputs:
+```text
+
+todo   
+todo write code
+list
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+OOPS!!! A command cannot be empty. Try todo, deadline, event, list, mark, unmark, or bye.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! The description of a todo cannot be empty.
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] write code
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] write code
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
