@@ -33,3 +33,16 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
+
+## After code updates
+
+After every update to application code:
+
+1. Review `test/ui-test-plan.md` and add or update test cases when the code
+   changes user-visible behavior or introduces a relevant scenario. If the
+   existing cases still cover the behavior, leave the plan unchanged.
+2. Invoke the project-specific `$test-ui` skill from the repository root:
+   `python3 .codex/skills/test-ui/scripts/run_ui_tests.py`.
+3. Treat a failed UI test as a failed change. Stop, report the actual and
+   expected output, and do not present the code update as verified until the
+   failure is resolved.
