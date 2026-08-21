@@ -4,6 +4,8 @@ import java.util.Scanner;
  * The main entry point for the Duchess chatbot.
  */
 public class Duchess {
+    private static final int MAX_TASKS = 100;
+
     public static void main(String[] args) {
         String separator = "____________________________________________________________";
         String banner = """
@@ -19,6 +21,9 @@ public class Duchess {
         System.out.println(separator);
 
         Scanner scanner = new Scanner(System.in);
+        String[] tasks = new String[MAX_TASKS];
+        int taskCount = 0;
+
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
 
@@ -30,7 +35,19 @@ public class Duchess {
             }
 
             System.out.println(separator);
-            System.out.println(command);
+
+            if (command.equalsIgnoreCase("list")) {
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println((i + 1) + ". " + tasks[i]);
+                }
+            } else if (taskCount < MAX_TASKS) {
+                tasks[taskCount] = command;
+                taskCount++;
+                System.out.println("added: " + command);
+            } else {
+                System.out.println("Sorry, I cannot store more than " + MAX_TASKS + " tasks.");
+            }
+
             System.out.println(separator);
         }
     }
