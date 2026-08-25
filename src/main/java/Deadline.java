@@ -1,37 +1,43 @@
-/**
- * Represents a task that must be completed by a specified time.
- */
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+/** Represents a task that must be completed by a specified date. */
 public class Deadline extends Task {
-    /** The deadline supplied by the user. */
-    protected String by;
+    /** The deadline stored as an actual Java date rather than plain text. */
+    protected LocalDate by;
+
+    /** Format used when displaying a deadline to the user. */
+    private static final DateTimeFormatter DISPLAY_DATE_FORMAT = DateTimeFormatter
+            .ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
     /**
-     * Creates an unfinished deadline task.
+     * Creates an unfinished deadline task by parsing an ISO date.
      *
      * @param description the task description
-     * @param by the deadline
+     * @param by the deadline in {@code yyyy-MM-dd} format
      */
     public Deadline(String description, String by) {
         super(description, TaskType.DEADLINE);
-        this.by = by;
+        this.by = LocalDate.parse(by);
     }
 
     /**
-     * Returns the deadline detail so it can be persisted and restored.
+     * Returns the deadline so it can be persisted in machine-readable form.
      *
-     * @return the deadline detail
+     * @return the deadline date
      */
-    public String getBy() {
+    public LocalDate getBy() {
         return by;
     }
 
     /**
-     * Returns the deadline display with its type, status, and deadline.
+     * Returns the formatted deadline display with its type and status.
      *
      * @return the formatted deadline task
      */
     @Override
     public String toString() {
-        return super.toString() + " (by: " + by + ")";
+        return super.toString() + " (by: " + by.format(DISPLAY_DATE_FORMAT) + ")";
     }
 }

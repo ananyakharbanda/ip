@@ -13,7 +13,7 @@ subtypes stored together, and that `mark N` works polymorphically.
 Inputs:
 ```text
 todo read book
-deadline return book /by Sunday
+deadline return book /by 2019-12-02
 event buy bread /at Saturday
 mark 2
 list
@@ -33,19 +33,19 @@ ____________________________________________________________
 added: [T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
-added: [D][ ] return book (by: Sunday)
+added: [D][ ] return book (by: Dec 02 2019)
 ____________________________________________________________
 ____________________________________________________________
 added: [E][ ] buy bread (at: Saturday)
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] return book (by: Sunday)
+  [D][X] return book (by: Dec 02 2019)
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
-2.[D][X] return book (by: Sunday)
+2.[D][X] return book (by: Dec 02 2019)
 3.[E][ ] buy bread (at: Saturday)
 ____________________________________________________________
 ____________________________________________________________
@@ -61,7 +61,7 @@ new count, and reindexes the remaining tasks correctly.
 Inputs:
 ```text
 todo read book
-deadline return book /by June 6th
+deadline return book /by 2019-06-06
 event project meeting /at Aug 6th 2pm to 4pm
 todo join sports club
 list
@@ -85,7 +85,7 @@ ____________________________________________________________
 added: [T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
-added: [D][ ] return book (by: June 6th)
+added: [D][ ] return book (by: Jun 06 2019)
 ____________________________________________________________
 ____________________________________________________________
 added: [E][ ] project meeting (at: Aug 6th 2pm to 4pm)
@@ -96,7 +96,7 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
-2.[D][ ] return book (by: June 6th)
+2.[D][ ] return book (by: Jun 06 2019)
 3.[E][ ] project meeting (at: Aug 6th 2pm to 4pm)
 4.[T][ ] join sports club
 ____________________________________________________________
@@ -108,7 +108,7 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
-2.[D][ ] return book (by: June 6th)
+2.[D][ ] return book (by: Jun 06 2019)
 3.[T][ ] join sports club
 ____________________________________________________________
 ____________________________________________________________
@@ -118,7 +118,7 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
-2.[D][ ] return book (by: June 6th)
+2.[D][ ] return book (by: Jun 06 2019)
 3.[T][X] join sports club
 ____________________________________________________________
 ____________________________________________________________
@@ -244,7 +244,7 @@ case and still produce the correct polymorphic state.
 Inputs:
 ```text
 TODO   read book
-DEADLINE report /BY Friday
+DEADLINE report /BY 2019-06-07
 EVENT meeting /AT Monday
 MARK 2
 LIST
@@ -264,19 +264,19 @@ ____________________________________________________________
 added: [T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
-added: [D][ ] report (by: Friday)
+added: [D][ ] report (by: Jun 07 2019)
 ____________________________________________________________
 ____________________________________________________________
 added: [E][ ] meeting (at: Monday)
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] report (by: Friday)
+  [D][X] report (by: Jun 07 2019)
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
-2.[D][X] report (by: Friday)
+2.[D][X] report (by: Jun 07 2019)
 3.[E][ ] meeting (at: Monday)
 ____________________________________________________________
 ____________________________________________________________
@@ -427,7 +427,7 @@ tasks and that deleting the final task leaves an empty list.
 Inputs:
 ```text
 todo first task
-deadline middle task /by Friday
+deadline middle task /by 2019-06-07
 event last task /at Monday
 mark 2
 delete 1
@@ -451,14 +451,14 @@ ____________________________________________________________
 added: [T][ ] first task
 ____________________________________________________________
 ____________________________________________________________
-added: [D][ ] middle task (by: Friday)
+added: [D][ ] middle task (by: Jun 07 2019)
 ____________________________________________________________
 ____________________________________________________________
 added: [E][ ] last task (at: Monday)
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
-  [D][X] middle task (by: Friday)
+  [D][X] middle task (by: Jun 07 2019)
 ____________________________________________________________
 ____________________________________________________________
 Noted. I've removed this task:
@@ -472,11 +472,11 @@ Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
-1.[D][X] middle task (by: Friday)
+1.[D][X] middle task (by: Jun 07 2019)
 ____________________________________________________________
 ____________________________________________________________
 Noted. I've removed this task:
-  [D][X] middle task (by: Friday)
+  [D][X] middle task (by: Jun 07 2019)
 Now you have 0 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -544,7 +544,7 @@ change the list and that a valid task can still be added afterward.
 
 Inputs:
 ```text
-deadline /by Friday
+deadline /by 2019-06-07
 event /at Monday
 list
 todo valid task
@@ -648,7 +648,7 @@ restores completion state, and ignores an invalid record without crashing.
 Initial data file:
 ```text
 T|1|cmVhZCBib29r
-D|0|cmV0dXJuIGJvb2s=|U3VuZGF5
+D|0|cmV0dXJuIGJvb2s=|MjAxOS0xMi0wMg==
 E|0|YnV5IGJyZWFk|U2F0dXJkYXk=
 not-a-valid-record
 ```
@@ -671,8 +671,46 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] read book
-2.[D][ ] return book (by: Sunday)
+2.[D][ ] return book (by: Dec 02 2019)
 3.[E][ ] buy bread (at: Saturday)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 14: Parse and display typed deadline dates
+
+Aim: Verify that an ISO deadline date is stored as a LocalDate and displayed
+in a different, readable format.
+
+Inputs:
+```text
+deadline return book /by 2019-12-02
+deadline submit report /by 2019-10-15
+list
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [D][ ] return book (by: Dec 02 2019)
+____________________________________________________________
+____________________________________________________________
+added: [D][ ] submit report (by: Oct 15 2019)
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[D][ ] return book (by: Dec 02 2019)
+2.[D][ ] submit report (by: Oct 15 2019)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

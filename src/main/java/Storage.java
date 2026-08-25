@@ -91,7 +91,7 @@ public class Storage {
         String description = encode(task.getDescription());
 
         if (task instanceof Deadline deadline) {
-            return type + "|" + status + "|" + description + "|" + encode(deadline.getBy());
+            return type + "|" + status + "|" + description + "|" + encode(deadline.getBy().toString());
         }
         if (task instanceof Event event) {
             return type + "|" + status + "|" + description + "|" + encode(event.getAt());
@@ -135,7 +135,11 @@ public class Storage {
             if (by == null || by.isBlank()) {
                 return null;
             }
-            task = new Deadline(description, by);
+            try {
+                task = new Deadline(description, by);
+            } catch (RuntimeException exception) {
+                return null;
+            }
         } else if (fields[0].equals("E") && fields.length == 4) {
             String at = decode(fields[3]);
             if (at == null || at.isBlank()) {
