@@ -25,6 +25,7 @@ class TestCase:
     aim: str
     inputs: str
     expected_output: str
+    initial_data: str | None
 
 
 def normalize_output(output: str) -> str:
@@ -39,6 +40,13 @@ def extract_fenced_block(section: str, label: str) -> str:
     if match is None:
         raise ValueError(f"Missing fenced block after '{label}'")
     return match.group(1).rstrip("\n")
+
+
+def extract_optional_fenced_block(section: str, label: str) -> str | None:
+    """Extract an optional text fence, returning None when it is absent."""
+    pattern = rf"^{re.escape(label)}\s*\n```[^\n]*\n(.*?)^```\s*$"
+    match = re.search(pattern, section, re.MULTILINE | re.DOTALL)
+    return match.group(1).rstrip("\n") if match is not None else None
 
 
 def parse_plan(plan_path: Path) -> tuple[str, list[TestCase]]:
@@ -60,6 +68,7 @@ def parse_plan(plan_path: Path) -> tuple[str, list[TestCase]]:
                 aim=aim_match.group(1).strip(),
                 inputs=extract_fenced_block(section, "Inputs:"),
                 expected_output=extract_fenced_block(section, "Expected output:"),
+                initial_data=extract_optional_fenced_block(section, "Initial data file:"),
             )
         )
 
@@ -130,21 +139,29 @@ def main() -> int:
                 command_parts[0] = java_executable("java")
 
             for test_case in cases:
-                try:
-                    result = subprocess.run(
-                        command_parts,
-                        input=test_case.inputs + "\n",
-                        text=True,
-                        capture_output=True,
-                        timeout=30,
-                    )
-                except subprocess.TimeoutExpired as exception:
-                    actual_output = exception.stdout or ""
-                    display_session(test_case, actual_output)
-                    print("TEST FAILED: the program timed out after 30 seconds.")
-                    print("Expected output:")
-                    print(test_case.expected_output)
-                    return 1
+                with tempfile.TemporaryDirectory(prefix="duchess-ui-case-") as case_directory:
+                    if test_case.initial_data is not None:
+                        data_directory = Path(case_directory) / "data"
+                        data_directory.mkdir()
+                        (data_directory / "duchess.txt").write_text(
+                            test_case.initial_data + "\n", encoding="utf-8"
+                        )
+                    try:
+                        result = subprocess.run(
+                            command_parts,
+                            input=test_case.inputs + "\n",
+                            text=True,
+                            capture_output=True,
+                            timeout=30,
+                            cwd=case_directory,
+                        )
+                    except subprocess.TimeoutExpired as exception:
+                        actual_output = exception.stdout or ""
+                        display_session(test_case, actual_output)
+                        print("TEST FAILED: the program timed out after 30 seconds.")
+                        print("Expected output:")
+                        print(test_case.expected_output)
+                        return 1
 
                 actual_output = result.stdout
                 if result.stderr:
