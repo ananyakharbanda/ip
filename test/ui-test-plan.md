@@ -639,3 +639,42 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## Test case 13: Load saved tasks and skip corrupted records
+
+Aim: Verify that Duchess loads todo, deadline, and event records at startup,
+restores completion state, and ignores an invalid record without crashing.
+
+Initial data file:
+```text
+T|1|cmVhZCBib29r
+D|0|cmV0dXJuIGJvb2s=|U3VuZGF5
+E|0|YnV5IGJyZWFk|U2F0dXJkYXk=
+not-a-valid-record
+```
+
+Inputs:
+```text
+list
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][ ] return book (by: Sunday)
+3.[E][ ] buy bread (at: Saturday)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```

@@ -17,6 +17,15 @@ public class Event extends Task {
     }
 
     /**
+     * Returns the event detail so it can be persisted and restored.
+     *
+     * @return the event detail
+     */
+    public String getAt() {
+        return at;
+    }
+
+    /**
      * Returns the event display with its type, status, and event time.
      *
      * @return the formatted event task
