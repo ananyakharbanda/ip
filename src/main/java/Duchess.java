@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.format.DateTimeParseException;
 
 /**
  * The main entry point for the Duchess chatbot.
@@ -104,7 +105,12 @@ public class Duchess {
         if (lowerCaseCommand.equals("deadline") || lowerCaseCommand.startsWith("deadline ")) {
             String[] details = splitTaskDetails(command.substring("deadline".length()), "/by");
             validateTaskDetails("deadline", details, "/by");
-            return new Deadline(details[0], details[1]);
+            try {
+                return new Deadline(details[0], details[1]);
+            } catch (DateTimeParseException exception) {
+                throw new DuchessException("OOPS!!! The deadline date is invalid. "
+                        + "Use yyyy-MM-dd, for example: 2019-12-02.");
+            }
         }
         if (lowerCaseCommand.equals("event") || lowerCaseCommand.startsWith("event ")) {
             String[] details = splitTaskDetails(command.substring("event".length()), "/at");
