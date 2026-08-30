@@ -1,6 +1,7 @@
 package duchess;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /** Owns Duchess's collection of tasks and the operations performed on it. */
 public class TaskList {
@@ -78,5 +79,23 @@ public class TaskList {
      */
     public int size() {
         return tasks.size();
+    }
+
+    /**
+     * Returns tasks whose descriptions contain a keyword, ignoring letter case.
+     *
+     * @param keyword the text to search for
+     * @return matching tasks in their original list order
+     */
+    public ArrayList<Task> find(String keyword) {
+        String lowerCaseKeyword = keyword.toLowerCase(Locale.ROOT);
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase(Locale.ROOT).contains(lowerCaseKeyword)) {
+                matchingTasks.add(task);
+            }
+        }
+        return matchingTasks;
     }
 }

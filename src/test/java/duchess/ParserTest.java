@@ -70,7 +70,7 @@ public class ParserTest {
     public void parseTask_blankCommand_throwsDuchessException() {
         assertParseTaskFailsWithMessage("   ",
                 "OOPS!!! A command cannot be empty. "
-                        + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+                        + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
     }
 
     /** Verifies that a todo without a description is rejected. */
@@ -123,7 +123,7 @@ public class ParserTest {
     public void parseTask_unknownCommand_throwsDuchessException() {
         assertParseTaskFailsWithMessage("blah",
                 "OOPS!!! I'm sorry, but I don't know what that means :-(\n"
-                        + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+                        + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
     }
 
     /** Verifies that a valid one-based index becomes the expected zero-based index. */

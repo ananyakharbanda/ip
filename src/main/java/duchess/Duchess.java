@@ -32,6 +32,8 @@ public class Duchess {
             try {
                 if (command.equalsIgnoreCase("list")) {
                     ui.showTasks(tasks);
+                } else if (command.toLowerCase().startsWith("find ")) {
+                    findTasks(command, tasks, ui);
                 } else if (command.toLowerCase().startsWith("mark ")) {
                     markTask(command, tasks, storage, ui);
                 } else if (command.toLowerCase().startsWith("unmark ")) {
@@ -47,6 +49,9 @@ public class Duchess {
                 } else if (command.equalsIgnoreCase("delete")) {
                     throw new DuchessException("OOPS!!! Please use 'delete <task number>', "
                             + "for example: delete 1.");
+                } else if (command.equalsIgnoreCase("find")) {
+                    throw new DuchessException("OOPS!!! Please use 'find <keyword>', "
+                            + "for example: find book.");
                 } else {
                     tasks.add(Parser.parseTask(command));
                     saveTasks(storage, tasks, ui);
@@ -58,6 +63,25 @@ public class Duchess {
 
             ui.showSeparator();
         }
+    }
+
+    /**
+     * Finds and displays tasks whose descriptions contain the requested keyword.
+     *
+     * @param command the complete find command entered by the user
+     * @param tasks the stored tasks
+     * @param ui the user interface used to display the results
+     * @throws DuchessException if the search keyword is empty
+     */
+    private static void findTasks(String command, TaskList tasks, Ui ui)
+            throws DuchessException {
+        String keyword = command.substring("find ".length()).trim();
+        if (keyword.isEmpty()) {
+            throw new DuchessException("OOPS!!! Please use 'find <keyword>', "
+                    + "for example: find book.");
+        }
+
+        ui.showMatchingTasks(tasks.find(keyword));
     }
 
     /** Saves the current state and reports a recoverable disk error. */

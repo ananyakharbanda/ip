@@ -211,7 +211,7 @@ OOPS!!! The description of a todo cannot be empty.
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! I'm sorry, but I don't know what that means :-(
-Try todo, deadline, event, list, mark, unmark, delete, or bye.
+Try todo, deadline, event, list, find, mark, unmark, delete, or bye.
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! A deadline must include a non-empty /by value. Example: deadline task description /by time.
@@ -402,7 +402,7 @@ Hello! I'm Duchess.
 What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
-OOPS!!! A command cannot be empty. Try todo, deadline, event, list, mark, unmark, delete, or bye.
+OOPS!!! A command cannot be empty. Try todo, deadline, event, list, find, mark, unmark, delete, or bye.
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! The description of a todo cannot be empty.
@@ -711,6 +711,65 @@ ____________________________________________________________
 Here are the tasks in your list:
 1.[D][ ] return book (by: Dec 02 2019)
 2.[D][ ] submit report (by: Oct 15 2019)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 15: Find tasks by a case-insensitive keyword
+
+Aim: Verify that `find` displays matching task types in list order, accepts
+different keyword casing, handles no matches, and rejects an empty keyword.
+
+Inputs:
+```text
+todo read book
+deadline return book /by 2019-12-02
+event project meeting /at Monday
+todo write code
+find book
+find MEETING
+find notebook
+find
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] read book
+____________________________________________________________
+____________________________________________________________
+added: [D][ ] return book (by: Dec 02 2019)
+____________________________________________________________
+____________________________________________________________
+added: [E][ ] project meeting (at: Monday)
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] write code
+____________________________________________________________
+____________________________________________________________
+Here are the matching tasks in your list:
+1.[T][ ] read book
+2.[D][ ] return book (by: Dec 02 2019)
+____________________________________________________________
+____________________________________________________________
+Here are the matching tasks in your list:
+1.[E][ ] project meeting (at: Monday)
+____________________________________________________________
+____________________________________________________________
+Here are the matching tasks in your list:
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Please use 'find <keyword>', for example: find book.
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
