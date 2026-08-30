@@ -1,4 +1,4 @@
-package duchess;
+package duchess.task;
 
 /**
  * Represents a basic todo task.

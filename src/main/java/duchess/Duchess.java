@@ -1,5 +1,11 @@
 package duchess;
 
+import duchess.parser.Parser;
+import duchess.storage.Storage;
+import duchess.task.Task;
+import duchess.task.TaskList;
+import duchess.ui.Ui;
+
 /**
  * The main entry point for the Duchess chatbot.
  */

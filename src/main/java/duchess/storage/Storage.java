@@ -1,5 +1,10 @@
-package duchess;
+package duchess.storage;
 
+import duchess.task.Deadline;
+import duchess.task.Event;
+import duchess.task.Task;
+import duchess.task.TaskList;
+import duchess.task.Todo;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
