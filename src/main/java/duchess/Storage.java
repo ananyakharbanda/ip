@@ -1,3 +1,5 @@
+package duchess;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -16,6 +18,10 @@ import java.util.Base64;
 public class Storage {
     /** The relative location used for Duchess's saved task list. */
     private static final Path DATA_FILE = Path.of("data", "duchess.txt");
+
+    /** Creates a storage service that uses Duchess's default data file. */
+    public Storage() {
+    }
 
     /**
      * Loads valid task records from disk.

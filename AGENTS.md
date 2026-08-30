@@ -22,6 +22,20 @@ Unless the user says otherwise, assume that you are assisting a student working 
   * Make generated code as self-explanatory as possible, and include explanatory comments where they improve understanding.
   * When faced with a design choice, choose the simplest option that is sufficient for the requirements, while briefly explaining relevant more advanced alternatives.
 
+## Java coding standard
+
+All Java code in this project must follow the SE-EDU basic and intermediate
+Java coding standard. Use the reusable project skill at
+`.codex/skills/seedu-java-coding-standard/SKILL.md` for every Java change; it
+is based on the authoritative
+[SE-EDU Java coding standard](https://se-education.org/guides/conventions/java/intermediate.html).
+
+In particular, keep classes in lower-case packages, use the prescribed naming
+and visibility conventions, use four-space indentation and K&R braces, keep
+lines within 120 characters, use explicit imports, and provide descriptive
+Javadoc for public classes and methods. Preserve the existing `duchess` package
+structure when adding Java files.
+
 # Project-specific requirements
 
 ## Java version:

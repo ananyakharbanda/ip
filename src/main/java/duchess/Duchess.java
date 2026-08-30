@@ -1,7 +1,18 @@
+package duchess;
+
 /**
  * The main entry point for the Duchess chatbot.
  */
 public class Duchess {
+    /** Creates a Duchess application entry point. */
+    public Duchess() {
+    }
+
+    /**
+     * Starts Duchess, loads saved tasks, and processes commands until the user exits.
+     *
+     * @param args command-line arguments, which Duchess does not currently use
+     */
     public static void main(String[] args) {
         Ui ui = new Ui();
         Storage storage = new Storage();

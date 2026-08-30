@@ -1,7 +1,7 @@
 # Coding Standards for This Project
 
-This document records the NUS CS2103/T standards to follow for future
-changes. It does not require retroactive changes to existing code.
+This document records the NUS CS2103/T standards applied to this project and
+required for all future changes.
 
 ## Authority
 
@@ -71,8 +71,8 @@ For future suggested commit messages, follow the course-linked
 
 ## Applying this document
 
-These standards will guide new code and files changed in future tasks. Existing
-default-package classes and other current conventions are intentionally left
-unchanged by this documentation-only update. A package migration or a
-broader style cleanup should be requested as a separate task.
-
+These standards apply to all Java code in this project. The current source is
+organized under the lower-case `duchess` package, and future code must preserve
+that package structure. The reusable project skill at
+`.codex/skills/seedu-java-coding-standard/SKILL.md` provides the operational
+checklist for agents making Java changes.
