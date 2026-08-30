@@ -21,7 +21,7 @@ public final class Parser {
         String lowerCaseCommand = command.toLowerCase();
         if (command.trim().isEmpty()) {
             throw new DuchessException("OOPS!!! A command cannot be empty. "
-                    + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+                    + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
         }
         if (lowerCaseCommand.equals("todo") || lowerCaseCommand.startsWith("todo ")) {
             String description = command.substring("todo".length()).trim();
@@ -47,7 +47,7 @@ public final class Parser {
         }
 
         throw new DuchessException("OOPS!!! I'm sorry, but I don't know what that means :-(\n"
-                + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+                + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
     }
 
     /**

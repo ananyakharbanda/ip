@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /** Handles all console input and output for Duchess. */
@@ -56,6 +57,18 @@ public class Ui {
         System.out.println("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
             System.out.println((i + 1) + "." + tasks.get(i));
+        }
+    }
+
+    /**
+     * Displays matching tasks with their positions in the search results.
+     *
+     * @param matchingTasks the tasks that matched the user's keyword
+     */
+    public void showMatchingTasks(ArrayList<Task> matchingTasks) {
+        System.out.println("Here are the matching tasks in your list:");
+        for (int i = 0; i < matchingTasks.size(); i++) {
+            System.out.println((i + 1) + "." + matchingTasks.get(i));
         }
     }
 
