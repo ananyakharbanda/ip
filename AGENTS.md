@@ -36,6 +36,14 @@ For every task that changes files, provide a suggested commit message for the us
 to apply. Leave changes uncommitted by default; only commit when the user
 explicitly asks for that task, and never push changes.
 
+## JUnit coverage target:
+
+Maintain JUnit coverage for roughly the top 50% of methods by value, prioritizing
+complex, core, or critical business logic. After every application-code change,
+review and update the relevant JUnit tests so the tests continue to reflect the
+changed behavior and this coverage target remains satisfied. Run the Gradle
+JUnit test task with Java 25 after updating the tests.
+
 ## After code updates
 
 After every update to application code:
