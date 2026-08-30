@@ -1,4 +1,4 @@
-package duchess;
+package duchess.task;
 
 /**
  * Represents a task in Duchess's in-memory task list.

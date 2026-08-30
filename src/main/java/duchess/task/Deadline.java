@@ -1,4 +1,4 @@
-package duchess;
+package duchess.task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

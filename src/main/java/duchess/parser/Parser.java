@@ -1,5 +1,10 @@
-package duchess;
+package duchess.parser;
 
+import duchess.DuchessException;
+import duchess.task.Deadline;
+import duchess.task.Event;
+import duchess.task.Task;
+import duchess.task.Todo;
 import java.time.format.DateTimeParseException;
 
 /** Converts user-entered text into validated task data and indexes. */

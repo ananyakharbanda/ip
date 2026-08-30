@@ -1,5 +1,7 @@
-package duchess;
+package duchess.ui;
 
+import duchess.task.Task;
+import duchess.task.TaskList;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -85,7 +87,11 @@ public class Ui {
         }
     }
 
-    /** Displays the task that was added. */
+    /**
+     * Displays the task that was added.
+     *
+     * @param task the newly added task
+     */
     public void showTaskAdded(Task task) {
         System.out.println("added: " + task);
     }

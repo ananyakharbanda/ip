@@ -1,4 +1,4 @@
-package duchess;
+package duchess.task;
 
 import java.util.ArrayList;
 import java.util.Locale;

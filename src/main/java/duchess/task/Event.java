@@ -1,4 +1,4 @@
-package duchess;
+package duchess.task;
 
 /**
  * Represents a task associated with a specified event time.

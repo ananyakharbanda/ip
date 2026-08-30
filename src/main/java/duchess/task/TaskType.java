@@ -1,4 +1,4 @@
-package duchess;
+package duchess.task;
 
 /**
  * The supported categories of tasks in Duchess.

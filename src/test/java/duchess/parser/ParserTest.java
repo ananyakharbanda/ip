@@ -1,4 +1,4 @@
-package duchess;
+package duchess.parser;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import duchess.DuchessException;
+import duchess.task.Deadline;
+import duchess.task.Event;
+import duchess.task.Todo;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
