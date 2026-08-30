@@ -22,6 +22,20 @@ Unless the user says otherwise, assume that you are assisting a student working 
   * Make generated code as self-explanatory as possible, and include explanatory comments where they improve understanding.
   * When faced with a design choice, choose the simplest option that is sufficient for the requirements, while briefly explaining relevant more advanced alternatives.
 
+## Java coding standard
+
+All Java code in this project must follow the SE-EDU basic and intermediate
+Java coding standard. Use the reusable project skill at
+`.codex/skills/seedu-java-coding-standard/SKILL.md` for every Java change; it
+is based on the authoritative
+[SE-EDU Java coding standard](https://se-education.org/guides/conventions/java/intermediate.html).
+
+In particular, keep classes in lower-case packages, use the prescribed naming
+and visibility conventions, use four-space indentation and K&R braces, keep
+lines within 120 characters, use explicit imports, and provide descriptive
+Javadoc for public classes and methods. Preserve the existing `duchess` package
+structure when adding Java files.
+
 # Project-specific requirements
 
 ## Java version:
@@ -43,6 +57,16 @@ complex, core, or critical business logic. After every application-code change,
 review and update the relevant JUnit tests so the tests continue to reflect the
 changed behavior and this coverage target remains satisfied. Run the Gradle
 JUnit test task with Java 25 after updating the tests.
+## Git coding standard
+
+All future commits and branches in this project must follow the SE-EDU Git
+conventions. Use the reusable project skill at
+`.codex/skills/seedu-git-standard/SKILL.md` before preparing a commit or branch.
+
+Commit subjects must be imperative, start with a capital letter, omit a final
+period, and stay within the 72-character hard limit. Add a separated, 72-column
+wrapped body for non-trivial commits explaining what changed and why. Use
+meaningful kebab-case branch names, or the issue-number format when applicable.
 
 ## After code updates
 

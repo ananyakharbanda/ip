@@ -1,3 +1,5 @@
+package duchess;
+
 /**
  * Represents a task in Duchess's in-memory task list.
  */

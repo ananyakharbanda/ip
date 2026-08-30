@@ -93,7 +93,7 @@ def java_executable(name: str) -> str:
 
 def compile_sources(classes_dir: Path) -> None:
     """Compile all project Java sources into the supplied temporary directory."""
-    sources = sorted(Path("src/main/java").glob("*.java"))
+    sources = sorted(Path("src/main/java").rglob("*.java"))
     if not sources:
         raise RuntimeError("No Java sources found in src/main/java")
     command = [java_executable("javac"), "-d", str(classes_dir), *(str(source) for source in sources)]

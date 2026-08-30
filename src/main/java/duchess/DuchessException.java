@@ -1,3 +1,5 @@
+package duchess;
+
 /**
  * Represents an expected, user-correctable error in Duchess.
  */

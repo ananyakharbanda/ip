@@ -1,3 +1,5 @@
+package duchess;
+
 import java.util.Scanner;
 
 /** Handles all console input and output for Duchess. */

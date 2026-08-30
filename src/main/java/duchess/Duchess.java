@@ -1,3 +1,5 @@
+package duchess;
+
 /**
  * The main entry point for the Duchess chatbot.
  */

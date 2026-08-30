@@ -38,7 +38,9 @@ test {
 
 application {
     // Duchess is in the default package, so this is the executable entry point.
-    mainClass = 'Duchess'
+    mainClass = 'duchess.Duchess'
+    // Duchess is the executable entry point in the duchess package.
+    mainClass = 'duchess.Duchess'
 }
 
 jar {

@@ -1,3 +1,5 @@
+package duchess;
+
 /**
  * The supported categories of tasks in Duchess.
  */

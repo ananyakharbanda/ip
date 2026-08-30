@@ -3,7 +3,7 @@
 Run the tests from the repository root. The runner compiles the Java sources
 into a temporary directory before starting each test case in a fresh process.
 
-Run command: `java -cp {classes} Duchess`
+Run command: `java -cp {classes} duchess.Duchess`
 
 ## Test case 1: Create and mark multiple task types
 

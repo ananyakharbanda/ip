@@ -1,3 +1,5 @@
+package duchess;
+
 import java.util.ArrayList;
 
 /** Owns Duchess's collection of tasks and the operations performed on it. */
