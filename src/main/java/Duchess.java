@@ -1,53 +1,32 @@
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.time.format.DateTimeParseException;
-
 /**
  * The main entry point for the Duchess chatbot.
  */
 public class Duchess {
     public static void main(String[] args) {
-        String separator = "____________________________________________________________";
-        String banner = """
-                +------------------------+
-                |        Duchess         |
-                +------------------------+
-                """;
-
-        System.out.println(separator);
-        System.out.print(banner);
-        System.out.println("Hello! I'm Duchess.");
-        System.out.println("What can I do for you?");
-        System.out.println(separator);
-
-        Scanner scanner = new Scanner(System.in);
+        Ui ui = new Ui();
         Storage storage = new Storage();
-        ArrayList<Task> tasks = storage.loadTasks();
+        TaskList tasks = storage.loadTasks();
+        ui.showWelcome();
 
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine();
+        while (ui.hasNextLine()) {
+            String command = ui.readCommand();
 
             if (command.equalsIgnoreCase("bye")) {
-                System.out.println(separator);
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.println(separator);
+                ui.showGoodbye();
                 break;
             }
 
-            System.out.println(separator);
+            ui.showSeparator();
 
             try {
                 if (command.equalsIgnoreCase("list")) {
-                    System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println((i + 1) + "." + tasks.get(i));
-                    }
+                    ui.showTasks(tasks);
                 } else if (command.toLowerCase().startsWith("mark ")) {
-                    markTask(command, tasks, storage);
+                    markTask(command, tasks, storage, ui);
                 } else if (command.toLowerCase().startsWith("unmark ")) {
-                    unmarkTask(command, tasks, storage);
+                    unmarkTask(command, tasks, storage, ui);
                 } else if (command.toLowerCase().startsWith("delete ")) {
-                    deleteTask(command, tasks, storage);
+                    deleteTask(command, tasks, storage, ui);
                 } else if (command.equalsIgnoreCase("mark")) {
                     throw new DuchessException("OOPS!!! Please use 'mark <task number>', "
                             + "for example: mark 1.");
@@ -58,108 +37,24 @@ public class Duchess {
                     throw new DuchessException("OOPS!!! Please use 'delete <task number>', "
                             + "for example: delete 1.");
                 } else {
-                    tasks.add(createTask(command));
-                    saveTasks(storage, tasks);
-                    System.out.println("added: " + tasks.get(tasks.size() - 1));
+                    tasks.add(Parser.parseTask(command));
+                    saveTasks(storage, tasks, ui);
+                    ui.showTaskAdded(tasks.get(tasks.size() - 1));
                 }
             } catch (DuchessException exception) {
-                System.out.println(exception.getMessage());
+                ui.showError(exception.getMessage());
             }
 
-            System.out.println(separator);
+            ui.showSeparator();
         }
     }
 
     /** Saves the current state and reports a recoverable disk error. */
-    private static void saveTasks(Storage storage, ArrayList<Task> tasks) {
+    private static void saveTasks(Storage storage, TaskList tasks, Ui ui) {
         try {
             storage.saveTasks(tasks);
         } catch (java.io.IOException exception) {
-            System.out.println("OOPS!!! I couldn't save your task list to disk.");
-        }
-    }
-
-    /**
-     * Creates the appropriate task subtype from a user command.
-     *
-     * <p>Commands without an explicit type are treated as todo tasks so that
-     * existing plain task input remains supported.</p>
-     *
-     * @param command the complete task command
-     * @throws DuchessException if the command is empty, malformed, or unknown
-     * @return a task object whose runtime type matches the command
-     */
-    private static Task createTask(String command) throws DuchessException {
-        String lowerCaseCommand = command.toLowerCase();
-        if (command.trim().isEmpty()) {
-            throw new DuchessException("OOPS!!! A command cannot be empty. "
-                    + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
-        }
-        if (lowerCaseCommand.equals("todo") || lowerCaseCommand.startsWith("todo ")) {
-            String description = command.substring("todo".length()).trim();
-            if (description.isEmpty()) {
-                throw new DuchessException("OOPS!!! The description of a todo cannot be empty.");
-            }
-            return new Todo(description);
-        }
-        if (lowerCaseCommand.equals("deadline") || lowerCaseCommand.startsWith("deadline ")) {
-            String[] details = splitTaskDetails(command.substring("deadline".length()), "/by");
-            validateTaskDetails("deadline", details, "/by");
-            try {
-                return new Deadline(details[0], details[1]);
-            } catch (DateTimeParseException exception) {
-                throw new DuchessException("OOPS!!! The deadline date is invalid. "
-                        + "Use yyyy-MM-dd, for example: 2019-12-02.");
-            }
-        }
-        if (lowerCaseCommand.equals("event") || lowerCaseCommand.startsWith("event ")) {
-            String[] details = splitTaskDetails(command.substring("event".length()), "/at");
-            validateTaskDetails("event", details, "/at");
-            return new Event(details[0], details[1]);
-        }
-
-        throw new DuchessException("OOPS!!! I'm sorry, but I don't know what that means :-(\n"
-                + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
-    }
-
-    /**
-     * Splits a typed task command into its description and detail value.
-     *
-     * @param taskDetails the text after the task type
-     * @param marker the detail marker, such as {@code /by} or {@code /at}
-     * @return a two-element array containing description and detail
-     */
-    private static String[] splitTaskDetails(String taskDetails, String marker) {
-        int markerIndex = taskDetails.toLowerCase().indexOf(marker.toLowerCase());
-        if (markerIndex < 0) {
-            return new String[]{taskDetails.trim(), ""};
-        }
-
-        String description = taskDetails.substring(0, markerIndex).trim();
-        String detail = taskDetails.substring(markerIndex + marker.length()).trim();
-        return new String[]{description, detail};
-    }
-
-    /**
-     * Checks that a deadline or event has both required pieces of information.
-     *
-     * @param taskType the task type being validated
-     * @param details the parsed description and detail
-     * @param marker the required detail marker
-     * @throws DuchessException if the description or detail is missing
-     */
-    private static void validateTaskDetails(String taskType, String[] details, String marker)
-            throws DuchessException {
-        if (details[0].isEmpty()) {
-            throw new DuchessException("OOPS!!! The description of a " + taskType
-                    + " cannot be empty.");
-        }
-        if (details[1].isEmpty()) {
-            String article = taskType.equals("event") ? "An" : "A";
-            throw new DuchessException("OOPS!!! " + article + " " + taskType
-                    + " must include a non-empty "
-                    + marker + " value. Example: " + taskType + " task description "
-                    + marker + " time.");
+            ui.showSaveError();
         }
     }
 
@@ -169,15 +64,14 @@ public class Duchess {
      * @param command the complete mark command entered by the user
      * @param tasks the stored tasks
      */
-    private static void markTask(String command, ArrayList<Task> tasks, Storage storage)
+    private static void markTask(String command, TaskList tasks, Storage storage, Ui ui)
             throws DuchessException {
-        int taskIndex = parseTaskIndex(command, "mark ");
+        int taskIndex = Parser.parseTaskIndex(command, "mark ");
         validateTaskIndex(taskIndex, tasks.size());
 
-        tasks.get(taskIndex).markAsDone();
-        saveTasks(storage, tasks);
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + tasks.get(taskIndex));
+        tasks.markAsDone(taskIndex);
+        saveTasks(storage, tasks, ui);
+        ui.showTaskMarked(tasks.get(taskIndex));
     }
 
     /**
@@ -186,15 +80,14 @@ public class Duchess {
      * @param command the complete unmark command entered by the user
      * @param tasks the stored tasks
      */
-    private static void unmarkTask(String command, ArrayList<Task> tasks, Storage storage)
+    private static void unmarkTask(String command, TaskList tasks, Storage storage, Ui ui)
             throws DuchessException {
-        int taskIndex = parseTaskIndex(command, "unmark ");
+        int taskIndex = Parser.parseTaskIndex(command, "unmark ");
         validateTaskIndex(taskIndex, tasks.size());
 
-        tasks.get(taskIndex).markAsNotDone();
-        saveTasks(storage, tasks);
-        System.out.println("Okay, I've marked this task as not done yet:");
-        System.out.println("  " + tasks.get(taskIndex));
+        tasks.markAsNotDone(taskIndex);
+        saveTasks(storage, tasks, ui);
+        ui.showTaskUnmarked(tasks.get(taskIndex));
     }
 
     /**
@@ -204,32 +97,14 @@ public class Duchess {
      * @param tasks the stored tasks
      * @throws DuchessException if the task number is invalid
      */
-    private static void deleteTask(String command, ArrayList<Task> tasks, Storage storage)
+    private static void deleteTask(String command, TaskList tasks, Storage storage, Ui ui)
             throws DuchessException {
-        int taskIndex = parseTaskIndex(command, "delete ");
+        int taskIndex = Parser.parseTaskIndex(command, "delete ");
         validateTaskIndex(taskIndex, tasks.size());
 
-        Task deletedTask = tasks.remove(taskIndex);
-        saveTasks(storage, tasks);
-        System.out.println("Noted. I've removed this task:");
-        System.out.println("  " + deletedTask);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-    }
-
-    /**
-     * Converts the one-based task number in a command into a zero-based list index.
-     *
-     * @param command the complete command
-     * @param prefix the command prefix, such as {@code "mark "}
-     * @return the zero-based index, or {@code -1} for malformed input
-     */
-    private static int parseTaskIndex(String command, String prefix) {
-        try {
-            int oneBasedIndex = Integer.parseInt(command.substring(prefix.length()).trim());
-            return oneBasedIndex - 1;
-        } catch (NumberFormatException | IndexOutOfBoundsException exception) {
-            return -1;
-        }
+        Task deletedTask = tasks.delete(taskIndex);
+        saveTasks(storage, tasks, ui);
+        ui.showTaskDeleted(deletedTask, tasks.size());
     }
 
     /**
