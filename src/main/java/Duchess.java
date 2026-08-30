@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.time.format.DateTimeParseException;
 
 /**
@@ -7,47 +6,30 @@ import java.time.format.DateTimeParseException;
  */
 public class Duchess {
     public static void main(String[] args) {
-        String separator = "____________________________________________________________";
-        String banner = """
-                +------------------------+
-                |        Duchess         |
-                +------------------------+
-                """;
-
-        System.out.println(separator);
-        System.out.print(banner);
-        System.out.println("Hello! I'm Duchess.");
-        System.out.println("What can I do for you?");
-        System.out.println(separator);
-
-        Scanner scanner = new Scanner(System.in);
+        Ui ui = new Ui();
         Storage storage = new Storage();
         ArrayList<Task> tasks = storage.loadTasks();
+        ui.showWelcome();
 
-        while (scanner.hasNextLine()) {
-            String command = scanner.nextLine();
+        while (ui.hasNextLine()) {
+            String command = ui.readCommand();
 
             if (command.equalsIgnoreCase("bye")) {
-                System.out.println(separator);
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.println(separator);
+                ui.showGoodbye();
                 break;
             }
 
-            System.out.println(separator);
+            ui.showSeparator();
 
             try {
                 if (command.equalsIgnoreCase("list")) {
-                    System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println((i + 1) + "." + tasks.get(i));
-                    }
+                    ui.showTasks(tasks);
                 } else if (command.toLowerCase().startsWith("mark ")) {
-                    markTask(command, tasks, storage);
+                    markTask(command, tasks, storage, ui);
                 } else if (command.toLowerCase().startsWith("unmark ")) {
-                    unmarkTask(command, tasks, storage);
+                    unmarkTask(command, tasks, storage, ui);
                 } else if (command.toLowerCase().startsWith("delete ")) {
-                    deleteTask(command, tasks, storage);
+                    deleteTask(command, tasks, storage, ui);
                 } else if (command.equalsIgnoreCase("mark")) {
                     throw new DuchessException("OOPS!!! Please use 'mark <task number>', "
                             + "for example: mark 1.");
@@ -59,23 +41,23 @@ public class Duchess {
                             + "for example: delete 1.");
                 } else {
                     tasks.add(createTask(command));
-                    saveTasks(storage, tasks);
-                    System.out.println("added: " + tasks.get(tasks.size() - 1));
+                    saveTasks(storage, tasks, ui);
+                    ui.showTaskAdded(tasks.get(tasks.size() - 1));
                 }
             } catch (DuchessException exception) {
-                System.out.println(exception.getMessage());
+                ui.showError(exception.getMessage());
             }
 
-            System.out.println(separator);
+            ui.showSeparator();
         }
     }
 
     /** Saves the current state and reports a recoverable disk error. */
-    private static void saveTasks(Storage storage, ArrayList<Task> tasks) {
+    private static void saveTasks(Storage storage, ArrayList<Task> tasks, Ui ui) {
         try {
             storage.saveTasks(tasks);
         } catch (java.io.IOException exception) {
-            System.out.println("OOPS!!! I couldn't save your task list to disk.");
+            ui.showSaveError();
         }
     }
 
@@ -169,15 +151,14 @@ public class Duchess {
      * @param command the complete mark command entered by the user
      * @param tasks the stored tasks
      */
-    private static void markTask(String command, ArrayList<Task> tasks, Storage storage)
+    private static void markTask(String command, ArrayList<Task> tasks, Storage storage, Ui ui)
             throws DuchessException {
         int taskIndex = parseTaskIndex(command, "mark ");
         validateTaskIndex(taskIndex, tasks.size());
 
         tasks.get(taskIndex).markAsDone();
-        saveTasks(storage, tasks);
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + tasks.get(taskIndex));
+        saveTasks(storage, tasks, ui);
+        ui.showTaskMarked(tasks.get(taskIndex));
     }
 
     /**
@@ -186,15 +167,14 @@ public class Duchess {
      * @param command the complete unmark command entered by the user
      * @param tasks the stored tasks
      */
-    private static void unmarkTask(String command, ArrayList<Task> tasks, Storage storage)
+    private static void unmarkTask(String command, ArrayList<Task> tasks, Storage storage, Ui ui)
             throws DuchessException {
         int taskIndex = parseTaskIndex(command, "unmark ");
         validateTaskIndex(taskIndex, tasks.size());
 
         tasks.get(taskIndex).markAsNotDone();
-        saveTasks(storage, tasks);
-        System.out.println("Okay, I've marked this task as not done yet:");
-        System.out.println("  " + tasks.get(taskIndex));
+        saveTasks(storage, tasks, ui);
+        ui.showTaskUnmarked(tasks.get(taskIndex));
     }
 
     /**
@@ -204,16 +184,14 @@ public class Duchess {
      * @param tasks the stored tasks
      * @throws DuchessException if the task number is invalid
      */
-    private static void deleteTask(String command, ArrayList<Task> tasks, Storage storage)
+    private static void deleteTask(String command, ArrayList<Task> tasks, Storage storage, Ui ui)
             throws DuchessException {
         int taskIndex = parseTaskIndex(command, "delete ");
         validateTaskIndex(taskIndex, tasks.size());
 
         Task deletedTask = tasks.remove(taskIndex);
-        saveTasks(storage, tasks);
-        System.out.println("Noted. I've removed this task:");
-        System.out.println("  " + deletedTask);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+        saveTasks(storage, tasks, ui);
+        ui.showTaskDeleted(deletedTask, tasks.size());
     }
 
     /**
