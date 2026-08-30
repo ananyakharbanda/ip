@@ -17,6 +17,10 @@ public class Storage {
     /** The relative location used for Duchess's saved task list. */
     private static final Path DATA_FILE = Path.of("data", "duchess.txt");
 
+    /** Creates a storage service that uses Duchess's default data file. */
+    public Storage() {
+    }
+
     /**
      * Loads valid task records from disk.
      *
