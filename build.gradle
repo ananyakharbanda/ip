@@ -37,7 +37,8 @@ test {
 }
 
 application {
-    mainClass = 'seedu.duke.Duke'
+    // Duchess is in the default package, so this is the executable entry point.
+    mainClass = 'Duchess'
 }
 
 jar {
