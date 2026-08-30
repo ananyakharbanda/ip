@@ -24,13 +24,13 @@ public class Storage {
      * are ignored individually, allowing valid records in a partially
      * corrupted file to remain usable.</p>
      *
-     * @return the restored tasks, or an empty list when the file is absent or
-     *         cannot be read
+     * @return the restored tasks, or an empty task list when the file is absent
+     *         or cannot be read
      */
-    public ArrayList<Task> loadTasks() {
+    public TaskList loadTasks() {
         ArrayList<Task> tasks = new ArrayList<>();
         if (!Files.isRegularFile(DATA_FILE)) {
-            return tasks;
+            return new TaskList();
         }
 
         try {
@@ -42,9 +42,9 @@ public class Storage {
             }
         } catch (IOException exception) {
             // A damaged or inaccessible file should not prevent Duchess from starting.
-            return new ArrayList<>();
+            return new TaskList();
         }
-        return tasks;
+        return new TaskList(tasks);
     }
 
     /**
@@ -57,15 +57,15 @@ public class Storage {
      * @param tasks the task list to save
      * @throws IOException if the directory or file cannot be written
      */
-    public void saveTasks(ArrayList<Task> tasks) throws IOException {
+    public void saveTasks(TaskList tasks) throws IOException {
         Path parent = DATA_FILE.getParent();
         Files.createDirectories(parent);
         Path temporaryFile = Files.createTempFile(parent, "duchess", ".tmp");
 
         try {
             ArrayList<String> lines = new ArrayList<>();
-            for (Task task : tasks) {
-                lines.add(serialize(task));
+            for (int i = 0; i < tasks.size(); i++) {
+                lines.add(serialize(tasks.get(i)));
             }
             Files.write(temporaryFile, lines, StandardCharsets.UTF_8);
             try {

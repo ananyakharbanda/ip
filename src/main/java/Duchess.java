@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.time.format.DateTimeParseException;
 
 /**
@@ -8,7 +7,7 @@ public class Duchess {
     public static void main(String[] args) {
         Ui ui = new Ui();
         Storage storage = new Storage();
-        ArrayList<Task> tasks = storage.loadTasks();
+        TaskList tasks = storage.loadTasks();
         ui.showWelcome();
 
         while (ui.hasNextLine()) {
@@ -53,7 +52,7 @@ public class Duchess {
     }
 
     /** Saves the current state and reports a recoverable disk error. */
-    private static void saveTasks(Storage storage, ArrayList<Task> tasks, Ui ui) {
+    private static void saveTasks(Storage storage, TaskList tasks, Ui ui) {
         try {
             storage.saveTasks(tasks);
         } catch (java.io.IOException exception) {
@@ -151,12 +150,12 @@ public class Duchess {
      * @param command the complete mark command entered by the user
      * @param tasks the stored tasks
      */
-    private static void markTask(String command, ArrayList<Task> tasks, Storage storage, Ui ui)
+    private static void markTask(String command, TaskList tasks, Storage storage, Ui ui)
             throws DuchessException {
         int taskIndex = parseTaskIndex(command, "mark ");
         validateTaskIndex(taskIndex, tasks.size());
 
-        tasks.get(taskIndex).markAsDone();
+        tasks.markAsDone(taskIndex);
         saveTasks(storage, tasks, ui);
         ui.showTaskMarked(tasks.get(taskIndex));
     }
@@ -167,12 +166,12 @@ public class Duchess {
      * @param command the complete unmark command entered by the user
      * @param tasks the stored tasks
      */
-    private static void unmarkTask(String command, ArrayList<Task> tasks, Storage storage, Ui ui)
+    private static void unmarkTask(String command, TaskList tasks, Storage storage, Ui ui)
             throws DuchessException {
         int taskIndex = parseTaskIndex(command, "unmark ");
         validateTaskIndex(taskIndex, tasks.size());
 
-        tasks.get(taskIndex).markAsNotDone();
+        tasks.markAsNotDone(taskIndex);
         saveTasks(storage, tasks, ui);
         ui.showTaskUnmarked(tasks.get(taskIndex));
     }
@@ -184,12 +183,12 @@ public class Duchess {
      * @param tasks the stored tasks
      * @throws DuchessException if the task number is invalid
      */
-    private static void deleteTask(String command, ArrayList<Task> tasks, Storage storage, Ui ui)
+    private static void deleteTask(String command, TaskList tasks, Storage storage, Ui ui)
             throws DuchessException {
         int taskIndex = parseTaskIndex(command, "delete ");
         validateTaskIndex(taskIndex, tasks.size());
 
-        Task deletedTask = tasks.remove(taskIndex);
+        Task deletedTask = tasks.delete(taskIndex);
         saveTasks(storage, tasks, ui);
         ui.showTaskDeleted(deletedTask, tasks.size());
     }

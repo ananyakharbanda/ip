@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 
 /** Handles all console input and output for Duchess. */
@@ -53,7 +52,7 @@ public class Ui {
     }
 
     /** Displays every task with its one-based position. */
-    public void showTasks(ArrayList<Task> tasks) {
+    public void showTasks(TaskList tasks) {
         System.out.println("Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
             System.out.println((i + 1) + "." + tasks.get(i));
