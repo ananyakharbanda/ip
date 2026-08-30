@@ -50,6 +50,17 @@ For every task that changes files, provide a suggested commit message for the us
 to apply. Leave changes uncommitted by default; only commit when the user
 explicitly asks for that task, and never push changes.
 
+## Git coding standard
+
+All future commits and branches in this project must follow the SE-EDU Git
+conventions. Use the reusable project skill at
+`.codex/skills/seedu-git-standard/SKILL.md` before preparing a commit or branch.
+
+Commit subjects must be imperative, start with a capital letter, omit a final
+period, and stay within the 72-character hard limit. Add a separated, 72-column
+wrapped body for non-trivial commits explaining what changed and why. Use
+meaningful kebab-case branch names, or the issue-number format when applicable.
+
 ## After code updates
 
 After every update to application code:

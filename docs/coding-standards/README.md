@@ -69,6 +69,10 @@ For future suggested commit messages, follow the course-linked
 - Explain what changed and why; the diff shows how.
 - Use meaningful kebab-case branch names.
 
+The reusable project skill at
+`.codex/skills/seedu-git-standard/SKILL.md` provides the checklist for all
+future commits and branches.
+
 ## Applying this document
 
 These standards apply to all Java code in this project. The current source is
