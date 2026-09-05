@@ -66,6 +66,15 @@ public class Ui {
     }
 
     /**
+     * Displays a complete response produced by Duchess's command processor.
+     *
+     * @param message the response to display
+     */
+    public void showMessage(String message) {
+        System.out.println(message);
+    }
+
+    /**
      * Displays every task with its one-based position.
      *
      * @param tasks the task list to display
