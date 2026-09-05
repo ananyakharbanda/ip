@@ -56,7 +56,7 @@ public class Storage {
             // A damaged or inaccessible file should not prevent Duchess from starting.
             return new TaskList();
         }
-        return new TaskList(tasks);
+        return new TaskList(tasks.toArray(new Task[0]));
     }
 
     /**

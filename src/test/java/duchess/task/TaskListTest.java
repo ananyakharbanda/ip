@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-
 import org.junit.jupiter.api.Test;
 
 /** Tests the core task collection operations used by Duchess. */
@@ -37,15 +35,13 @@ public class TaskListTest {
         );
     }
 
-    /** Verifies that the constructor protects the task list from later source-list changes. */
+    /** Verifies that the varargs constructor protects the task list from array changes. */
     @Test
-    public void taskList_constructorCopiesInputList_keepsIndependentState() {
+    public void taskList_constructorCopiesInitialTasks_keepsIndependentState() {
         Task todo = new Todo("read book");
-        ArrayList<Task> initialTasks = new ArrayList<>();
-        initialTasks.add(todo);
-
+        Task[] initialTasks = {todo};
         TaskList tasks = new TaskList(initialTasks);
-        initialTasks.clear();
+        initialTasks[0] = new Todo("changed task");
 
         assertAll(
                 () -> assertEquals(1, tasks.size()),

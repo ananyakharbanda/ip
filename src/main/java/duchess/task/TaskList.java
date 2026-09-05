@@ -1,6 +1,7 @@
 package duchess.task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 /** Owns Duchess's collection of tasks and the operations performed on it. */
@@ -8,21 +9,16 @@ public class TaskList {
     /** The tasks currently stored by Duchess. */
     private final ArrayList<Task> tasks;
 
-    /** Creates an empty task list. */
-    public TaskList() {
-        tasks = new ArrayList<>();
-    }
-
     /**
      * Creates a task list containing the supplied tasks.
      *
      * <p>The collection is copied so callers cannot bypass this class's
      * operations by retaining a reference to the original list.</p>
      *
-     * @param tasks the initial tasks
+     * @param initialTasks the initial tasks, which may be omitted
      */
-    public TaskList(ArrayList<Task> tasks) {
-        this.tasks = new ArrayList<>(tasks);
+    public TaskList(Task... initialTasks) {
+        tasks = new ArrayList<>(Arrays.asList(initialTasks));
     }
 
     /**
