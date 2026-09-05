@@ -52,13 +52,15 @@
         </module>
         <module name="PackageName">
             <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]{1,})*$"/>
-            <property name="severity" value="warning"/>
+            <!-- Lower-case package names are mandatory in the coding standard. -->
+            <property name="severity" value="error"/>
         </module>
         <module name="TypeName"/>
         <module name="ConstantName"/>
         <module name="StaticVariableName"/>
         <module name="MemberName"/>
         <module name="MethodName">
+            <!-- The two optional separators support SE-EDU's three-part test names. -->
             <property name="format" value="^[a-z][a-zA-Z0-9]*(_[a-z][a-zA-Z0-9]+){0,2}$"/>
         </module>
         <module name="ParameterName"/>
@@ -113,6 +115,10 @@
             <property name="message" value="Trailing whitespace"/>
         </module>
         <module name="OperatorWrap">
+            <!-- Non-assignment operators are placed at the start of wrapped lines. -->
+            <property name="tokens" value="QUESTION, COLON, EQUAL, NOT_EQUAL, DIV, PLUS, MINUS, STAR, MOD, SR, BSR,
+                    GE, GT, SL, LE, LT, BXOR, BOR, LOR, BAND, LAND, LITERAL_INSTANCEOF, TYPE_EXTENSION_AND,
+                    METHOD_REF"/>
             <property name="option" value="nl"/>
         </module>
         <module name="OperatorWrap">
@@ -125,6 +131,7 @@
             <property name="option" value="nl"/>
         </module>
         <module name="SeparatorWrap">
+            <!-- LPAREN is intentionally omitted: attached method calls are valid and required by SE-EDU. -->
             <property name="tokens" value="COMMA, RBRACK, ARRAY_DECLARATOR, ELLIPSIS, SEMI"/>
             <property name="option" value="eol"/>
         </module>
