@@ -1,28 +1,59 @@
 package duchess;
 
+import java.util.ArrayList;
+import java.util.Locale;
+
 import duchess.parser.Parser;
 import duchess.storage.Storage;
 import duchess.task.Task;
 import duchess.task.TaskList;
 import duchess.ui.Ui;
 
-/**
- * The main entry point for the Duchess chatbot.
- */
+/** Coordinates Duchess's task commands and provides responses to user interfaces. */
 public class Duchess {
-    /** Creates a Duchess application entry point. */
+    private static final String COMMAND_TYPE_ADD = "add";
+    private static final String COMMAND_TYPE_BYE = "bye";
+    private static final String COMMAND_TYPE_DELETE = "delete";
+    private static final String COMMAND_TYPE_ERROR = "error";
+    private static final String COMMAND_TYPE_FIND = "find";
+    private static final String COMMAND_TYPE_LIST = "list";
+    private static final String COMMAND_TYPE_MARK = "mark";
+    private static final String COMMAND_TYPE_OTHER = "other";
+    private static final String COMMAND_TYPE_UNMARK = "unmark";
+    private static final String SAVE_ERROR = "OOPS!!! I couldn't save your task list to disk.";
+
+    /** Persists Duchess's tasks. */
+    private final Storage storage;
+
+    /** Stores the tasks shared by the CLI and GUI interfaces. */
+    private final TaskList tasks;
+
+    /** Identifies the most recently processed command for GUI styling. */
+    private String commandType;
+
+    /** Records whether the user has issued the {@code bye} command. */
+    private boolean exitRequested;
+
+    /** Creates a Duchess application using the default storage location. */
     public Duchess() {
+        this(new Storage(), null);
+    }
+
+    /** Creates a Duchess instance with collaborators supplied by a test. */
+    Duchess(Storage storage, TaskList tasks) {
+        this.storage = storage;
+        this.tasks = tasks == null ? storage.loadTasks() : tasks;
+        commandType = COMMAND_TYPE_OTHER;
     }
 
     /**
-     * Starts Duchess, loads saved tasks, and processes commands until the user exits.
+     * Starts Duchess in its text-based interface.
      *
      * @param args command-line arguments, which Duchess does not currently use
      */
     public static void main(String[] args) {
+        Duchess duchess = new Duchess();
         Ui ui = new Ui();
-        Storage storage = new Storage();
-        TaskList tasks = storage.loadTasks();
         ui.showWelcome();
 
         while (ui.hasNextLine()) {
@@ -34,131 +65,158 @@ public class Duchess {
             }
 
             ui.showSeparator();
-
-            try {
-                if (command.equalsIgnoreCase("list")) {
-                    ui.showTasks(tasks);
-                } else if (command.toLowerCase().startsWith("find ")) {
-                    findTasks(command, tasks, ui);
-                } else if (command.toLowerCase().startsWith("mark ")) {
-                    markTask(command, tasks, storage, ui);
-                } else if (command.toLowerCase().startsWith("unmark ")) {
-                    unmarkTask(command, tasks, storage, ui);
-                } else if (command.toLowerCase().startsWith("delete ")) {
-                    deleteTask(command, tasks, storage, ui);
-                } else if (command.equalsIgnoreCase("mark")) {
-                    throw new DuchessException("OOPS!!! Please use 'mark <task number>', "
-                            + "for example: mark 1.");
-                } else if (command.equalsIgnoreCase("unmark")) {
-                    throw new DuchessException("OOPS!!! Please use 'unmark <task number>', "
-                            + "for example: unmark 1.");
-                } else if (command.equalsIgnoreCase("delete")) {
-                    throw new DuchessException("OOPS!!! Please use 'delete <task number>', "
-                            + "for example: delete 1.");
-                } else if (command.equalsIgnoreCase("find")) {
-                    throw new DuchessException("OOPS!!! Please use 'find <keyword>', "
-                            + "for example: find book.");
-                } else {
-                    tasks.add(Parser.parseTask(command));
-                    saveTasks(storage, tasks, ui);
-                    ui.showTaskAdded(tasks.get(tasks.size() - 1));
-                }
-            } catch (DuchessException exception) {
-                ui.showError(exception.getMessage());
-            }
-
+            ui.showMessage(duchess.getResponse(command));
             ui.showSeparator();
         }
     }
 
     /**
-     * Finds and displays tasks whose descriptions contain the requested keyword.
+     * Processes one command and returns the response for a user interface.
      *
-     * @param command the complete find command entered by the user
-     * @param tasks the stored tasks
-     * @param ui the user interface used to display the results
-     * @throws DuchessException if the search keyword is empty
+     * @param command the complete command entered by the user
+     * @return the response that should be displayed to the user
      */
-    private static void findTasks(String command, TaskList tasks, Ui ui)
-            throws DuchessException {
+    public String getResponse(String command) {
+        String safeCommand = command == null ? "" : command;
+        String lowerCaseCommand = safeCommand.toLowerCase(Locale.ROOT);
+
+        if (safeCommand.equalsIgnoreCase("bye")) {
+            commandType = COMMAND_TYPE_BYE;
+            exitRequested = true;
+            return "Bye. Hope to see you again soon!";
+        }
+
+        try {
+            if (safeCommand.equalsIgnoreCase("list")) {
+                commandType = COMMAND_TYPE_LIST;
+                return formatTasks(tasks, "Here are the tasks in your list:");
+            } else if (lowerCaseCommand.startsWith("find ")) {
+                commandType = COMMAND_TYPE_FIND;
+                return findTasks(safeCommand);
+            } else if (lowerCaseCommand.startsWith("mark ")) {
+                commandType = COMMAND_TYPE_MARK;
+                return markTask(safeCommand);
+            } else if (lowerCaseCommand.startsWith("unmark ")) {
+                commandType = COMMAND_TYPE_UNMARK;
+                return unmarkTask(safeCommand);
+            } else if (lowerCaseCommand.startsWith("delete ")) {
+                commandType = COMMAND_TYPE_DELETE;
+                return deleteTask(safeCommand);
+            } else if (safeCommand.equalsIgnoreCase("mark")) {
+                throw new DuchessException("OOPS!!! Please use 'mark <task number>', "
+                        + "for example: mark 1.");
+            } else if (safeCommand.equalsIgnoreCase("unmark")) {
+                throw new DuchessException("OOPS!!! Please use 'unmark <task number>', "
+                        + "for example: unmark 1.");
+            } else if (safeCommand.equalsIgnoreCase("delete")) {
+                throw new DuchessException("OOPS!!! Please use 'delete <task number>', "
+                        + "for example: delete 1.");
+            } else if (safeCommand.equalsIgnoreCase("find")) {
+                throw new DuchessException("OOPS!!! Please use 'find <keyword>', "
+                        + "for example: find book.");
+            }
+
+            commandType = COMMAND_TYPE_ADD;
+            Task task = Parser.parseTask(safeCommand);
+            tasks.add(task);
+            return withSaveWarning("added: " + task);
+        } catch (DuchessException exception) {
+            commandType = COMMAND_TYPE_ERROR;
+            return exception.getMessage();
+        }
+    }
+
+    /**
+     * Returns the category of the most recently processed command.
+     *
+     * @return the command category used by the GUI to style responses
+     */
+    public String getCommandType() {
+        return commandType;
+    }
+
+    /**
+     * Returns whether the user has requested to leave the conversation.
+     *
+     * @return {@code true} after the {@code bye} command has been processed
+     */
+    public boolean isExitRequested() {
+        return exitRequested;
+    }
+
+    /** Returns the response to a find command. */
+    private String findTasks(String command) throws DuchessException {
         String keyword = command.substring("find ".length()).trim();
         if (keyword.isEmpty()) {
             throw new DuchessException("OOPS!!! Please use 'find <keyword>', "
                     + "for example: find book.");
         }
 
-        ui.showMatchingTasks(tasks.find(keyword));
+        return formatTasks(tasks.find(keyword), "Here are the matching tasks in your list:");
     }
 
-    /** Saves the current state and reports a recoverable disk error. */
-    private static void saveTasks(Storage storage, TaskList tasks, Ui ui) {
+    /** Returns the response to a mark command. */
+    private String markTask(String command) throws DuchessException {
+        int taskIndex = Parser.parseTaskIndex(command, "mark ");
+        validateTaskIndex(taskIndex);
+
+        tasks.markAsDone(taskIndex);
+        return withSaveWarning("Nice! I've marked this task as done:\n  " + tasks.get(taskIndex));
+    }
+
+    /** Returns the response to an unmark command. */
+    private String unmarkTask(String command) throws DuchessException {
+        int taskIndex = Parser.parseTaskIndex(command, "unmark ");
+        validateTaskIndex(taskIndex);
+
+        tasks.markAsNotDone(taskIndex);
+        return withSaveWarning("Okay, I've marked this task as not done yet:\n  "
+                + tasks.get(taskIndex));
+    }
+
+    /** Returns the response to a delete command. */
+    private String deleteTask(String command) throws DuchessException {
+        int taskIndex = Parser.parseTaskIndex(command, "delete ");
+        validateTaskIndex(taskIndex);
+
+        Task deletedTask = tasks.delete(taskIndex);
+        return withSaveWarning("Noted. I've removed this task:\n  " + deletedTask
+                + "\nNow you have " + tasks.size() + " tasks in the list.");
+    }
+
+    /** Returns a response after reporting a recoverable storage failure. */
+    private String withSaveWarning(String response) {
         try {
             storage.saveTasks(tasks);
+            return response;
         } catch (java.io.IOException exception) {
-            ui.showSaveError();
+            return SAVE_ERROR + "\n" + response;
         }
     }
 
-    /**
-     * Marks the task identified by a one-based index as done.
-     *
-     * @param command the complete mark command entered by the user
-     * @param tasks the stored tasks
-     */
-    private static void markTask(String command, TaskList tasks, Storage storage, Ui ui)
-            throws DuchessException {
-        int taskIndex = Parser.parseTaskIndex(command, "mark ");
-        validateTaskIndex(taskIndex, tasks.size());
-
-        tasks.markAsDone(taskIndex);
-        saveTasks(storage, tasks, ui);
-        ui.showTaskMarked(tasks.get(taskIndex));
+    /** Formats a task collection using the same numbering as the CLI. */
+    private String formatTasks(TaskList taskList, String heading) {
+        ArrayList<Task> taskArray = new ArrayList<>();
+        for (int i = 0; i < taskList.size(); i++) {
+            taskArray.add(taskList.get(i));
+        }
+        return formatTasks(taskArray, heading);
     }
 
-    /**
-     * Marks the task identified by a one-based index as not done.
-     *
-     * @param command the complete unmark command entered by the user
-     * @param tasks the stored tasks
-     */
-    private static void unmarkTask(String command, TaskList tasks, Storage storage, Ui ui)
-            throws DuchessException {
-        int taskIndex = Parser.parseTaskIndex(command, "unmark ");
-        validateTaskIndex(taskIndex, tasks.size());
-
-        tasks.markAsNotDone(taskIndex);
-        saveTasks(storage, tasks, ui);
-        ui.showTaskUnmarked(tasks.get(taskIndex));
+    /** Formats a list of tasks using one-based indexes. */
+    private String formatTasks(ArrayList<Task> taskArray, String heading) {
+        StringBuilder response = new StringBuilder(heading);
+        for (int i = 0; i < taskArray.size(); i++) {
+            response.append('\n').append(i + 1).append('.').append(taskArray.get(i));
+        }
+        return response.toString();
     }
 
-    /**
-     * Deletes the task identified by a one-based index.
-     *
-     * @param command the complete delete command entered by the user
-     * @param tasks the stored tasks
-     * @throws DuchessException if the task number is invalid
-     */
-    private static void deleteTask(String command, TaskList tasks, Storage storage, Ui ui)
-            throws DuchessException {
-        int taskIndex = Parser.parseTaskIndex(command, "delete ");
-        validateTaskIndex(taskIndex, tasks.size());
-
-        Task deletedTask = tasks.delete(taskIndex);
-        saveTasks(storage, tasks, ui);
-        ui.showTaskDeleted(deletedTask, tasks.size());
-    }
-
-    /**
-     * Checks that a command refers to a stored task.
-     *
-     * @param taskIndex the zero-based task index
-     * @param taskCount the number of stored tasks
-     * @throws DuchessException if the task index is outside the list
-     */
-    private static void validateTaskIndex(int taskIndex, int taskCount) throws DuchessException {
-        if (taskIndex < 0 || taskIndex >= taskCount) {
+    /** Validates a zero-based task index. */
+    private void validateTaskIndex(int taskIndex) throws DuchessException {
+        if (taskIndex < 0 || taskIndex >= tasks.size()) {
             throw new DuchessException("OOPS!!! Please provide a valid task number between 1 and "
-                    + taskCount + ".");
+                    + tasks.size() + ".");
         }
     }
 }

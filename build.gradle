@@ -59,8 +59,15 @@ test {
 }
 
 application {
-    // Duchess is the executable entry point in the duchess package.
+    // The launcher avoids the JavaFX classpath issue described in tutorial Part 1.
+    mainClass = 'duchess.gui.Launcher'
+}
+
+// Keeps the original text UI available for fast console and UI-plan testing.
+tasks.register('runCli', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
     mainClass = 'duchess.Duchess'
+    standardInput = System.in
 }
 
 jar {
