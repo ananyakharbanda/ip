@@ -16,11 +16,28 @@ public class Duchess {
     private static final String COMMAND_TYPE_DELETE = "delete";
     private static final String COMMAND_TYPE_ERROR = "error";
     private static final String COMMAND_TYPE_FIND = "find";
+    private static final String COMMAND_TYPE_HELP = "help";
     private static final String COMMAND_TYPE_LIST = "list";
     private static final String COMMAND_TYPE_MARK = "mark";
     private static final String COMMAND_TYPE_OTHER = "other";
     private static final String COMMAND_TYPE_UNMARK = "unmark";
     private static final String SAVE_ERROR = "OOPS!!! I couldn't save your task list to disk.";
+    private static final String HELP_RESPONSE = """
+            Available commands:
+            todo <description>              Add a todo task.
+            deadline <description> /by <date>
+                                             Add a deadline task using yyyy-MM-dd.
+            event <description> /at <time>  Add an event task.
+            list                              Show all tasks.
+            find <keyword>                   Find tasks by keyword.
+            mark <task number>               Mark a task as done.
+            unmark <task number>             Mark a task as not done.
+            delete <task number>             Delete a task.
+            help                              Show this command guide.
+            bye                               Exit Duchess.
+
+            Commands are not case-sensitive.
+            """;
 
     /** Persists Duchess's tasks. */
     private final Storage storage;
@@ -87,7 +104,10 @@ public class Duchess {
         }
 
         try {
-            if (safeCommand.equalsIgnoreCase("list")) {
+            if (safeCommand.equalsIgnoreCase("help")) {
+                commandType = COMMAND_TYPE_HELP;
+                return HELP_RESPONSE;
+            } else if (safeCommand.equalsIgnoreCase("list")) {
                 commandType = COMMAND_TYPE_LIST;
                 return formatTasks(tasks, "Here are the tasks in your list:");
             } else if (lowerCaseCommand.startsWith("find ")) {
