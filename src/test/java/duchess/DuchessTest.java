@@ -26,6 +26,27 @@ public class DuchessTest {
         );
     }
 
+    /** Verifies that the help command lists every supported command and input format. */
+    @Test
+    public void getResponse_helpCommand_listsAvailableCommands() {
+        Duchess duchess = new Duchess(new Storage(), new TaskList());
+
+        String response = duchess.getResponse("help");
+
+        assertAll(
+                () -> assertTrue(response.contains("todo <description>")),
+                () -> assertTrue(response.contains("deadline <description> /by <date>")),
+                () -> assertTrue(response.contains("event <description> /at <time>")),
+                () -> assertTrue(response.contains("find <keyword>")),
+                () -> assertTrue(response.contains("mark <task number>")),
+                () -> assertTrue(response.contains("unmark <task number>")),
+                () -> assertTrue(response.contains("delete <task number>")),
+                () -> assertTrue(response.contains("help")),
+                () -> assertTrue(response.contains("bye")),
+                () -> assertEquals("help", duchess.getCommandType())
+        );
+    }
+
     /** Verifies that the GUI can process the command used to end a conversation. */
     @Test
     public void getResponse_byeCommand_requestsExit() {

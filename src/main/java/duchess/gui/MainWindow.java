@@ -26,6 +26,9 @@ public class MainWindow extends AnchorPane {
     @FXML
     private Button sendButton;
 
+    @FXML
+    private Button helpButton;
+
     /** The shared command processor used by the GUI. */
     private Duchess duchess;
 
@@ -49,7 +52,8 @@ public class MainWindow extends AnchorPane {
     public void setDuchess(Duchess duchess) {
         this.duchess = duchess;
         dialogContainer.getChildren().add(
-                DialogBox.getDuchessDialog("Hello! I'm Duchess.\nWhat can I do for you?",
+                DialogBox.getDuchessDialog("Hello! I'm Duchess.\nType help or click Help to see "
+                                + "the available commands.",
                         duchessImage, "welcome"));
     }
 
@@ -69,7 +73,17 @@ public class MainWindow extends AnchorPane {
     /** Sends the current text to Duchess and appends both sides of the conversation. */
     @FXML
     private void handleUserInput() {
-        String input = userInput.getText();
+        submitCommand(userInput.getText());
+    }
+
+    /** Displays the command guide when the GUI Help button is pressed. */
+    @FXML
+    private void handleHelp() {
+        submitCommand("help");
+    }
+
+    /** Sends a command through the shared processor and appends the conversation bubbles. */
+    private void submitCommand(String input) {
         String response = duchess.getResponse(input);
         String commandType = duchess.getCommandType();
 
@@ -81,6 +95,7 @@ public class MainWindow extends AnchorPane {
         if (duchess.isExitRequested()) {
             userInput.setDisable(true);
             sendButton.setDisable(true);
+            helpButton.setDisable(true);
         }
     }
 }
