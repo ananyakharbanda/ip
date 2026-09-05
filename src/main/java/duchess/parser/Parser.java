@@ -1,11 +1,12 @@
 package duchess.parser;
 
+import java.time.format.DateTimeParseException;
+
 import duchess.DuchessException;
 import duchess.task.Deadline;
 import duchess.task.Event;
 import duchess.task.Task;
 import duchess.task.Todo;
-import java.time.format.DateTimeParseException;
 
 /** Converts user-entered text into validated task data and indexes. */
 public final class Parser {
@@ -21,8 +22,8 @@ public final class Parser {
      * {@code event} prefix.</p>
      *
      * @param command the complete task command
-     * @throws DuchessException if the command is empty, malformed, or unknown
      * @return a task object whose runtime type matches the command
+     * @throws DuchessException if the command is empty, malformed, or unknown
      */
     public static Task parseTask(String command) throws DuchessException {
         String lowerCaseCommand = command.toLowerCase();

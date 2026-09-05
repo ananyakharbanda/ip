@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'application'
+    // Adds checkstyleMain and checkstyleTest tasks for the SE-EDU style rules.
+    id 'checkstyle'
     id 'com.gradleup.shadow' version '9.5.1'
 }
 
@@ -11,6 +13,11 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+checkstyle {
+    // Keep this version aligned with the version used by IntelliJ's Checkstyle plugin.
+    toolVersion = '14.1.0'
 }
 
 dependencies {
