@@ -1,9 +1,10 @@
 package duchess.ui;
 
-import duchess.task.Task;
-import duchess.task.TaskList;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import duchess.task.Task;
+import duchess.task.TaskList;
 
 /** Handles all console input and output for Duchess. */
 public class Ui {

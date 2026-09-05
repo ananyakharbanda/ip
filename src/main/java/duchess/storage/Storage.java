@@ -1,10 +1,5 @@
 package duchess.storage;
 
-import duchess.task.Deadline;
-import duchess.task.Event;
-import duchess.task.Task;
-import duchess.task.TaskList;
-import duchess.task.Todo;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -13,6 +8,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Base64;
+
+import duchess.task.Deadline;
+import duchess.task.Event;
+import duchess.task.Task;
+import duchess.task.TaskList;
+import duchess.task.Todo;
 
 /**
  * Saves Duchess tasks in a file relative to the project root.

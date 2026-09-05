@@ -7,13 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.Test;
+
 import duchess.DuchessException;
 import duchess.task.Deadline;
 import duchess.task.Event;
 import duchess.task.Todo;
-import java.time.LocalDate;
-
-import org.junit.jupiter.api.Test;
 
 /** Tests the task-index parsing behavior used by Duchess commands. */
 public class ParserTest {
