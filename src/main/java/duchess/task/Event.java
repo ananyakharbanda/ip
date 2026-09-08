@@ -5,7 +5,7 @@ package duchess.task;
  */
 public class Event extends Task {
     /** The event time supplied by the user. */
-    protected String at;
+    private String at;
 
     /**
      * Creates an unfinished event task.

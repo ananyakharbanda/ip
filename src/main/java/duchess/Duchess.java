@@ -76,15 +76,13 @@ public class Duchess {
 
         while (ui.hasNextLine()) {
             String command = ui.readCommand();
-
-            if (command.equalsIgnoreCase("bye")) {
-                ui.showGoodbye();
-                break;
-            }
-
             ui.showSeparator();
             ui.showMessage(duchess.getResponse(command));
             ui.showSeparator();
+
+            if (duchess.isExitRequested()) {
+                break;
+            }
         }
     }
 

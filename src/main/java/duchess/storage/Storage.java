@@ -102,7 +102,7 @@ public class Storage {
         assert task != null : "A saved task must not be null";
         assert task.getType() != null && task.getDescription() != null
                 : "A saved task must have a type and description";
-        String type = task.getType().name().substring(0, 1);
+        String type = task.getType().getIcon();
         String status = task.isDone() ? "1" : "0";
         String description = encode(task.getDescription());
 

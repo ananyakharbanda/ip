@@ -5,13 +5,13 @@ package duchess.task;
  */
 public class Task {
     /** The text entered by the user for this task. */
-    protected String description;
+    private String description;
 
     /** Whether this task has been marked as done. */
-    protected boolean isDone;
+    private boolean isDone;
 
     /** The category used when displaying this task. */
-    protected TaskType type;
+    private TaskType type;
 
     /**
      * Creates a new, unfinished task.
