@@ -11,7 +11,7 @@ public class Deadline extends Task {
             .ofPattern("MMM dd yyyy", Locale.ENGLISH);
 
     /** The deadline stored as an actual Java date rather than plain text. */
-    protected LocalDate by;
+    private LocalDate by;
 
     /**
      * Creates an unfinished deadline task by parsing an ISO date.
