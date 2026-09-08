@@ -28,6 +28,7 @@ dependencies {
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}"
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.14.4'
 
+    // Bundle JavaFX for each supported platform so the executable JAR is self-contained.
     String javaFxVersion = '17.0.7'
 
     implementation("org.openjfx:javafx-base:${javaFxVersion}:win")
