@@ -29,6 +29,9 @@ public class Task {
      * @param type the task category
      */
     public Task(String description, TaskType type) {
+        assert description != null && !description.isBlank()
+                : "A task must have a non-blank description";
+        assert type != null : "A task must have a category";
         this.description = description;
         this.isDone = false;
         this.type = type;

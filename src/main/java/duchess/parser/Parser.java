@@ -26,6 +26,7 @@ public final class Parser {
      * @throws DuchessException if the command is empty, malformed, or unknown
      */
     public static Task parseTask(String command) throws DuchessException {
+        assert command != null : "The parser requires a command string";
         String lowerCaseCommand = command.toLowerCase();
         if (command.trim().isEmpty()) {
             throw new DuchessException("OOPS!!! A command cannot be empty. "
@@ -66,6 +67,7 @@ public final class Parser {
      * @return the zero-based index, or {@code -1} for malformed input
      */
     public static int parseTaskIndex(String command, String prefix) {
+        assert command != null && prefix != null : "Task-index parsing requires command and prefix text";
         try {
             int oneBasedIndex = Integer.parseInt(command.substring(prefix.length()).trim());
             return oneBasedIndex - 1;
@@ -102,6 +104,8 @@ public final class Parser {
      */
     private static void validateTaskDetails(String taskType, String[] details, String marker)
             throws DuchessException {
+        assert details != null && details.length == 2
+                : "Task details must contain exactly a description and a detail value";
         if (details[0].isEmpty()) {
             throw new DuchessException("OOPS!!! The description of a " + taskType
                     + " cannot be empty.");

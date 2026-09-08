@@ -70,6 +70,7 @@ public class Storage {
      * @throws IOException if the directory or file cannot be written
      */
     public void saveTasks(TaskList tasks) throws IOException {
+        assert tasks != null : "Storage requires a task list to save";
         Path parent = DATA_FILE.getParent();
         Files.createDirectories(parent);
         Path temporaryFile = Files.createTempFile(parent, "duchess", ".tmp");
@@ -98,6 +99,9 @@ public class Storage {
      * @return one line suitable for the data file
      */
     private String serialize(Task task) {
+        assert task != null : "A saved task must not be null";
+        assert task.getType() != null && task.getDescription() != null
+                : "A saved task must have a type and description";
         String type = task.getType().name().substring(0, 1);
         String status = task.isDone() ? "1" : "0";
         String description = encode(task.getDescription());
@@ -162,6 +166,7 @@ public class Storage {
             return null;
         }
 
+        assert task != null : "A valid record must produce a task";
         if (isDone) {
             task.markAsDone();
         }

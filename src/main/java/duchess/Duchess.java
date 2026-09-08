@@ -58,6 +58,7 @@ public class Duchess {
 
     /** Creates a Duchess instance with collaborators supplied by a test. */
     Duchess(Storage storage, TaskList tasks) {
+        assert storage != null : "Duchess requires a storage collaborator";
         this.storage = storage;
         this.tasks = tasks == null ? storage.loadTasks() : tasks;
         commandType = COMMAND_TYPE_OTHER;
@@ -138,6 +139,7 @@ public class Duchess {
 
             commandType = COMMAND_TYPE_ADD;
             Task task = Parser.parseTask(safeCommand);
+            assert task != null : "The parser must return a task for a valid add command";
             tasks.add(task);
             return withSaveWarning("added: " + task);
         } catch (DuchessException exception) {
@@ -238,5 +240,7 @@ public class Duchess {
             throw new DuchessException("OOPS!!! Please provide a valid task number between 1 and "
                     + tasks.size() + ".");
         }
+        assert taskIndex >= 0 && taskIndex < tasks.size()
+                : "A validated task index must refer to an existing task";
     }
 }
