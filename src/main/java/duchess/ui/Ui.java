@@ -31,13 +31,6 @@ public class Ui {
         showSeparator();
     }
 
-    /** Displays Duchess's goodbye message. */
-    public void showGoodbye() {
-        showSeparator();
-        System.out.println("Bye. Hope to see you again soon!");
-        showSeparator();
-    }
-
     /**
      * Returns whether another command is available from the user.
      *
