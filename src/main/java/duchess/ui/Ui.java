@@ -1,10 +1,6 @@
 package duchess.ui;
 
-import java.util.ArrayList;
 import java.util.Scanner;
-
-import duchess.task.Task;
-import duchess.task.TaskList;
 
 /** Handles all console input and output for Duchess. */
 public class Ui {
@@ -72,83 +68,5 @@ public class Ui {
      */
     public void showMessage(String message) {
         System.out.println(message);
-    }
-
-    /**
-     * Displays every task with its one-based position.
-     *
-     * @param tasks the task list to display
-     */
-    public void showTasks(TaskList tasks) {
-        System.out.println("Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println((i + 1) + "." + tasks.get(i));
-        }
-    }
-    /**
-     * Displays matching tasks with their positions in the search results.
-    *
-    * @param matchingTasks the tasks that matched the user's keyword
-    */
-    public void showMatchingTasks(ArrayList<Task> matchingTasks) {
-        System.out.println("Here are the matching tasks in your list:");
-        for (int i = 0; i < matchingTasks.size(); i++) {
-            System.out.println((i + 1) + "." + matchingTasks.get(i));
-        }
-    }
-
-    /**
-     * Displays the task that was added.
-     *
-     * @param task the newly added task
-     */
-    public void showTaskAdded(Task task) {
-        System.out.println("added: " + task);
-    }
-
-    /**
-     * Displays confirmation that a task was marked as done.
-     *
-     * @param task the completed task
-     */
-    public void showTaskMarked(Task task) {
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + task);
-    }
-
-    /**
-     * Displays confirmation that a task was marked as not done.
-     *
-     * @param task the reopened task
-     */
-    public void showTaskUnmarked(Task task) {
-        System.out.println("Okay, I've marked this task as not done yet:");
-        System.out.println("  " + task);
-    }
-
-    /**
-     * Displays confirmation that a task was deleted and reports the new count.
-     *
-     * @param task the deleted task
-     * @param remainingTaskCount the number of tasks left after deletion
-     */
-    public void showTaskDeleted(Task task, int remainingTaskCount) {
-        System.out.println("Noted. I've removed this task:");
-        System.out.println("  " + task);
-        System.out.println("Now you have " + remainingTaskCount + " tasks in the list.");
-    }
-
-    /**
-     * Displays a user-correctable error.
-     *
-     * @param message the error message to display
-     */
-    public void showError(String message) {
-        System.out.println(message);
-    }
-
-    /** Displays the error used when saving tasks fails. */
-    public void showSaveError() {
-        System.out.println("OOPS!!! I couldn't save your task list to disk.");
     }
 }
