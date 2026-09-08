@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.Test;
 
 /** Tests the core task collection operations used by Duchess. */
@@ -95,6 +97,23 @@ public class TaskListTest {
         assertAll(
                 () -> assertFalse(task.isDone()),
                 () -> assertEquals(" ", task.getStatusIcon())
+        );
+    }
+
+    /** Verifies that finding tasks ignores case while preserving list order. */
+    @Test
+    public void taskList_findKeyword_returnsCaseInsensitiveMatchesInOrder() {
+        Task first = new Todo("read book");
+        Task second = new Deadline("return book", "2019-12-02");
+        Task third = new Todo("write code");
+        TaskList tasks = new TaskList(first, second, third);
+
+        ArrayList<Task> matchingTasks = tasks.find("BOOK");
+
+        assertAll(
+                () -> assertEquals(2, matchingTasks.size()),
+                () -> assertSame(first, matchingTasks.get(0)),
+                () -> assertSame(second, matchingTasks.get(1))
         );
     }
 }

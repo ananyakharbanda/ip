@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Objects;
 
 import duchess.task.Deadline;
 import duchess.task.Event;
@@ -40,23 +41,20 @@ public class Storage {
      *         or cannot be read
      */
     public TaskList loadTasks() {
-        ArrayList<Task> tasks = new ArrayList<>();
         if (!Files.isRegularFile(DATA_FILE)) {
             return new TaskList();
         }
 
         try {
-            for (String line : Files.readAllLines(DATA_FILE, StandardCharsets.UTF_8)) {
-                Task task = deserialize(line);
-                if (task != null) {
-                    tasks.add(task);
-                }
-            }
+            Task[] tasks = Files.readAllLines(DATA_FILE, StandardCharsets.UTF_8).stream()
+                    .map(this::deserialize)
+                    .filter(Objects::nonNull)
+                    .toArray(Task[]::new);
+            return new TaskList(tasks);
         } catch (IOException exception) {
             // A damaged or inaccessible file should not prevent Duchess from starting.
             return new TaskList();
         }
-        return new TaskList(tasks.toArray(new Task[0]));
     }
 
     /**

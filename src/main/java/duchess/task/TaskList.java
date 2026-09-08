@@ -3,6 +3,7 @@ package duchess.task;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /** Owns Duchess's collection of tasks and the operations performed on it. */
 public class TaskList {
@@ -91,14 +92,10 @@ public class TaskList {
      */
     public ArrayList<Task> find(String keyword) {
         String lowerCaseKeyword = keyword.toLowerCase(Locale.ROOT);
-        ArrayList<Task> matchingTasks = new ArrayList<>();
-
-        for (Task task : tasks) {
-            if (task.getDescription().toLowerCase(Locale.ROOT).contains(lowerCaseKeyword)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT)
+                        .contains(lowerCaseKeyword))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /** Documents the index precondition shared by operations on one task. */
