@@ -15,6 +15,7 @@ public class Event extends Task {
      */
     public Event(String description, String at) {
         super(description, TaskType.EVENT);
+        assert at != null && !at.isBlank() : "An event must have a non-blank time value";
         this.at = at;
     }
 

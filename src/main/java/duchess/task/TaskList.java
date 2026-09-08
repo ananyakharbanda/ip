@@ -18,6 +18,7 @@ public class TaskList {
      * @param initialTasks the initial tasks, which may be omitted
      */
     public TaskList(Task... initialTasks) {
+        assert initialTasks != null : "A task list requires a non-null initial task array";
         tasks = new ArrayList<>(Arrays.asList(initialTasks));
     }
 
@@ -27,6 +28,7 @@ public class TaskList {
      * @param task the task to add
      */
     public void add(Task task) {
+        assert task != null : "A task list must not contain null tasks";
         tasks.add(task);
     }
 
@@ -37,6 +39,7 @@ public class TaskList {
      * @return the task at the specified index
      */
     public Task get(int index) {
+        assertValidIndex(index);
         return tasks.get(index);
     }
 
@@ -47,6 +50,7 @@ public class TaskList {
      * @return the removed task
      */
     public Task delete(int index) {
+        assertValidIndex(index);
         return tasks.remove(index);
     }
 
@@ -56,6 +60,7 @@ public class TaskList {
      * @param index the zero-based task index
      */
     public void markAsDone(int index) {
+        assertValidIndex(index);
         tasks.get(index).markAsDone();
     }
 
@@ -65,6 +70,7 @@ public class TaskList {
      * @param index the zero-based task index
      */
     public void markAsNotDone(int index) {
+        assertValidIndex(index);
         tasks.get(index).markAsNotDone();
     }
 
@@ -93,5 +99,11 @@ public class TaskList {
             }
         }
         return matchingTasks;
+    }
+
+    /** Documents the index precondition shared by operations on one task. */
+    private void assertValidIndex(int index) {
+        assert index >= 0 && index < tasks.size()
+                : "A task index must refer to an existing task";
     }
 }
