@@ -3,6 +3,7 @@ package duchess.gui;
 import duchess.Duchess;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -29,14 +30,17 @@ public class MainWindow extends AnchorPane {
     @FXML
     private Button helpButton;
 
+    @FXML
+    private Label statusLabel;
+
     /** The shared command processor used by the GUI. */
     private Duchess duchess;
 
     /** Avatar shown beside user messages. */
-    private final Image userImage = createAvatar(Color.web("#2864A8"));
+    private final Image userImage = createAvatar(Color.web("#5367A7"));
 
     /** Avatar shown beside Duchess responses. */
-    private final Image duchessImage = createAvatar(Color.web("#7A4EAB"));
+    private final Image duchessImage = createAvatar(Color.web("#6C4BDC"));
 
     /** Configures automatic scrolling after a new dialog is added. */
     @FXML
@@ -52,9 +56,10 @@ public class MainWindow extends AnchorPane {
     public void setDuchess(Duchess duchess) {
         this.duchess = duchess;
         dialogContainer.getChildren().add(
-                DialogBox.getDuchessDialog("Hello! I'm Duchess.\nType help or click Help to see "
-                                + "the available commands.",
+                DialogBox.getDuchessDialog("👋 Hello! I'm Duchess.\n\nType help or click Help to "
+                                + "see the available commands.",
                         duchessImage, "welcome"));
+        userInput.requestFocus();
     }
 
     /** Creates a simple in-memory avatar so the GUI has no external image dependency. */
@@ -90,6 +95,7 @@ public class MainWindow extends AnchorPane {
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getDuchessDialog(response, duchessImage, commandType));
+        updateStatus(commandType);
         userInput.clear();
 
         if (duchess.isExitRequested()) {
@@ -97,5 +103,18 @@ public class MainWindow extends AnchorPane {
             sendButton.setDisable(true);
             helpButton.setDisable(true);
         }
+    }
+
+    /** Updates the compact header status to reflect the latest command result. */
+    private void updateStatus(String commandType) {
+        String status = switch (commandType) {
+            case "add", "mark", "unmark" -> "● Updated";
+            case "delete" -> "● Removed";
+            case "error" -> "● Check input";
+            case "bye" -> "● See you soon";
+            case "help" -> "● Guide open";
+            default -> "● Ready";
+        };
+        statusLabel.setText(status);
     }
 }

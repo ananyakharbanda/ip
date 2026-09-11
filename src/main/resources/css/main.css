@@ -1,48 +1,143 @@
 .root {
-    main-color: #f4f0ff;
-    -fx-background-color: main-color;
-    -fx-font-family: "Arial";
+    app-background: #f7f8fc;
+    ink: #1d2433;
+    muted-ink: #737b8c;
+    brand: #6c4bdc;
+    -fx-background-color: app-background;
+    -fx-font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
 }
 
-.text-field {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #c9bce8;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-padding: 8px;
+.app-shell {
+    -fx-background-color: app-background;
 }
 
-.button {
-    -fx-background-color: #7a4eab;
-    -fx-background-radius: 8px;
-    -fx-font-weight: bold;
+.top-bar {
+    -fx-padding: 18px 20px 16px 20px;
+    -fx-background-color: linear-gradient(to right, #21183f, #3b286f);
+    -fx-effect: dropshadow(gaussian, rgba(34, 24, 67, 0.18), 12, 0.2, 0, 3);
+}
+
+.brand-icon {
+    -fx-min-width: 42px;
+    -fx-min-height: 42px;
+    -fx-alignment: center;
+    -fx-background-color: #8a6be8;
+    -fx-background-radius: 14px;
+    -fx-font-size: 22px;
+}
+
+.brand-title {
+    -fx-background-color: transparent;
     -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
 }
 
-.button:hover {
-    -fx-background-color: #9364c5;
+.brand-subtitle {
+    -fx-background-color: transparent;
+    -fx-text-fill: #d7cef8;
+    -fx-font-size: 11px;
 }
 
-.button:pressed {
-    -fx-background-color: #5c397f;
+.status-pill {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 20px;
+    -fx-padding: 7px 10px;
+    -fx-text-fill: #e7ddff;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
 }
 
-.scroll-pane,
-.scroll-pane .viewport {
+.status-pill:disabled {
+    -fx-opacity: 1;
+}
+
+.conversation-scroll,
+.conversation-scroll .viewport {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.conversation-scroll > .corner {
     -fx-background-color: transparent;
 }
 
 .scroll-bar {
-    -fx-background-color: main-color;
+    -fx-background-color: transparent;
+    -fx-padding: 0 2px 0 0;
 }
 
 .scroll-bar .thumb {
-    -fx-background-color: #b9a2d8;
+    -fx-background-color: #c7c3d8;
     -fx-background-radius: 1em;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #a89fc5;
 }
 
 .scroll-bar .increment-button,
 .scroll-bar .decrement-button {
     -fx-pref-height: 0;
+    -fx-pref-width: 0;
     -fx-opacity: 0;
+}
+
+.composer {
+    -fx-padding: 10px;
+    -fx-background-color: white;
+    -fx-background-radius: 16px;
+    -fx-border-color: #e4e6ef;
+    -fx-border-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(46, 52, 70, 0.12), 14, 0.2, 0, 4);
+}
+
+.text-field {
+    -fx-background-color: #f5f6fa;
+    -fx-background-radius: 11px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 11px;
+    -fx-padding: 10px 13px;
+    -fx-text-fill: ink;
+    -fx-prompt-text-fill: muted-ink;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #a996ee;
+    -fx-border-width: 1px;
+}
+
+.button {
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.primary-button {
+    -fx-background-color: brand;
+    -fx-background-radius: 11px;
+    -fx-padding: 11px 15px;
+    -fx-text-fill: white;
+}
+
+.primary-button:hover {
+    -fx-background-color: #8064e5;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #5438b7;
+}
+
+.secondary-button {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 10px;
+    -fx-padding: 8px 11px;
+    -fx-text-fill: white;
+}
+
+.secondary-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.22);
 }
