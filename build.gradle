@@ -15,11 +15,6 @@ repositories {
     mavenCentral()
 }
 
-checkstyle {
-    // Keep this version aligned with the version used by IntelliJ's Checkstyle plugin.
-    toolVersion = '14.1.0'
-}
-
 dependencies {
     String jUnitVersion = '5.14.4'
 
@@ -45,20 +40,6 @@ dependencies {
     implementation("org.openjfx:javafx-graphics:${javaFxVersion}:linux")
 }
 
-test {
-    useJUnitPlatform()
-
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-
-        showExceptions = true
-        exceptionFormat = 'full'
-        showCauses = true
-        showStackTraces = true
-        showStandardStreams = false
-    }
-}
-
 application {
     // The launcher avoids the JavaFX classpath issue described in tutorial Part 1.
     mainClass = 'duchess.gui.Launcher'
@@ -79,9 +60,12 @@ jar {
 }
 
 shadowJar {
-    archiveFileName = 'duke.jar'
+    archiveFileName = 'duchess.jar'
 }
 
 run {
     standardInput = System.in
 }
+
+// Keep quality and test-reporting conventions in a reusable Gradle script.
+apply from: 'gradle/quality.gradle'

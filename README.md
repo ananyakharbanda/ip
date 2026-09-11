@@ -1,64 +1,153 @@
-# Duchess project template
+# Duchess ✦ Royal Task Companion
 
-This is a project template for a greenfield Java project. It's named _Duchess_. Given below are instructions on how to use it.
+Duchess is a Java 25 task manager with both a command-line interface and a
+JavaFX graphical interface. It supports todos, deadlines, events, searching,
+completion tracking, and completion statistics.
 
-## Setting up in Intellij
+## Features
 
-Prerequisites: JDK 25, update Intellij to the most recent version.
+- Add `todo`, `deadline`, and `event` tasks.
+- Mark, unmark, delete, list, and search tasks.
+- View completion statistics, including tasks completed in the past seven days.
+- Save tasks automatically to `data/duchess.txt`.
+- Use the same command-processing logic from the CLI and JavaFX GUI.
+- Use FXML for the stable JavaFX layout and JavaFX controllers for dynamic
+  conversation content.
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 25** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/duchess/Duchess.java` file, right-click it, and choose `Run Duchess.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-   ____________________________________________________________
-   +------------------------+
-   |        Duchess         |
-   +------------------------+
-   Hello! I'm Duchess.
-   What can I do for you?
-   ____________________________________________________________
-   list
-   ____________________________________________________________
-   list
-   ____________________________________________________________
-   blah
-   ____________________________________________________________
-   blah
-   ____________________________________________________________
-   bye
-   ____________________________________________________________
-   Bye. Hope to see you again soon!
-   ____________________________________________________________
-   ```
+## Quick start
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+### Prerequisites
 
-## Creating and running the executable JAR
+- Java Development Kit 25
+- IntelliJ IDEA, if you want to work on the project in an IDE
+- Python 3, only if you want to run the console UI regression plan
 
-This project uses the Gradle Shadow plugin to create a fat (self-contained)
-JAR. From the project root, run:
+### Start the graphical interface
+
+On macOS or Linux:
+
+```bash
+./scripts/run-gui.sh
+```
+
+On Windows:
+
+```bat
+scripts\run-gui.bat
+```
+
+You can also invoke the Gradle wrapper directly with `./gradlew run` or
+`gradlew.bat run`.
+
+### Start the command-line interface
+
+On macOS or Linux:
+
+```bash
+./scripts/run-cli.sh
+```
+
+On Windows:
+
+```bat
+scripts\run-cli.bat
+```
+
+## Commands
+
+| Command | Example | Purpose |
+| --- | --- | --- |
+| `todo <description>` | `todo read book` | Add a todo |
+| `deadline <description> /by <date>` | `deadline submit report /by 2026-09-30` | Add a deadline |
+| `event <description> /at <time>` | `event team meeting /at Friday 3pm` | Add an event |
+| `list` | `list` | Display all tasks |
+| `find <keyword>` | `find report` | Search task descriptions |
+| `mark <number>` | `mark 2` | Mark a task as done |
+| `unmark <number>` | `unmark 2` | Mark a task as not done |
+| `delete <number>` | `delete 2` | Delete a task |
+| `stats` | `stats` | Display completion statistics |
+| `help` | `help` | Display the command guide |
+| `bye` | `bye` | Exit Duchess |
+
+Task numbers start from 1. Commands are case-insensitive.
+
+## Build and test
+
+Run compilation, the JUnit suite, and Checkstyle with:
+
+```bash
+./gradlew check
+```
+
+The equivalent project scripts are:
+
+```bash
+./scripts/test.sh       # macOS/Linux
+scripts\test.bat       # Windows
+```
+
+Run the complete console UI regression plan with:
+
+```bash
+./scripts/test-ui.sh    # macOS/Linux
+scripts\test-ui.bat    # Windows
+```
+
+The test plan compares complete user sessions against their expected output.
+See [docs/testing.md](docs/testing.md) for the test layers and rationale.
+
+## Creating an executable JAR
+
+Build a self-contained JAR with:
 
 ```bash
 ./gradlew clean shadowJar
 ```
 
-On Windows, use `gradlew.bat clean shadowJar` instead. The generated file is:
+On Windows, use `gradlew.bat clean shadowJar`. The generated artifact is:
 
 ```text
-build/libs/duke.jar
+build/libs/duchess.jar
 ```
 
-To run it, copy `duke.jar` into an empty folder, open a command window in that
-folder, and run:
+Run it with:
 
 ```bash
-java -jar "duke.jar"
+java -jar build/libs/duchess.jar
 ```
 
-The `build/` directory is ignored by Git, so do not commit the generated JAR.
-For distribution, attach the JAR to a GitHub release instead.
+The `build/` directory is ignored by Git and should not be committed.
+
+## Project structure
+
+```text
+src/main/java/duchess/
+├── Duchess.java              Shared command-processing boundary
+├── parser/                   Command parsing and validation
+├── task/                     Task domain classes and statistics
+├── storage/                  File persistence and legacy-record handling
+├── ui/                       Command-line presentation
+└── gui/                      JavaFX application and controllers
+
+src/main/resources/
+├── view/                     FXML layouts and reusable controls
+└── css/                      JavaFX stylesheets
+```
+
+The main FXML view composes reusable header, quick-command, conversation, and
+composer components. Dynamic dialog content is created by JavaFX code because
+it depends on the current command response.
+
+For a fuller explanation, see [docs/architecture.md](docs/architecture.md)
+and the [Duchess User Guide](docs/README.md).
+
+## IntelliJ setup
+
+1. Open this repository as an IntelliJ project.
+2. Configure the project SDK and language level to Java 25.
+3. Refresh the Gradle project.
+4. Run the `run` Gradle task for the JavaFX interface, or the `runCli` task for
+   the command-line interface.
+
+The Gradle wrapper downloads and uses the project’s configured Gradle version,
+so a global Gradle installation is not required.
