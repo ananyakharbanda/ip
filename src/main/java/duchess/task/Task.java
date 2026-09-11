@@ -1,5 +1,7 @@
 package duchess.task;
 
+import java.time.Instant;
+
 /**
  * Represents a task in Duchess's in-memory task list.
  */
@@ -9,6 +11,9 @@ public class Task {
 
     /** Whether this task has been marked as done. */
     private boolean isDone;
+
+    /** The latest time this task was marked as done, if known. */
+    private Instant completedAt;
 
     /** The category used when displaying this task. */
     private TaskType type;
@@ -34,6 +39,7 @@ public class Task {
         assert type != null : "A task must have a category";
         this.description = description;
         this.isDone = false;
+        this.completedAt = null;
         this.type = type;
     }
 
@@ -73,14 +79,39 @@ public class Task {
         return isDone;
     }
 
-    /** Marks this task as done. */
+    /** Marks this task as done at the current instant. */
     public void markAsDone() {
+        markAsDone(Instant.now());
+    }
+
+    /**
+     * Marks this task as done at a specified instant.
+     *
+     * <p>A null instant is allowed only when restoring a legacy record that
+     * has no completion timestamp.</p>
+     *
+     * @param completionTime the completion instant, or null when unknown
+     */
+    public void markAsDone(Instant completionTime) {
+        if (!isDone || completedAt == null) {
+            completedAt = completionTime;
+        }
         isDone = true;
     }
 
     /** Marks this task as not done. */
     public void markAsNotDone() {
         isDone = false;
+        completedAt = null;
+    }
+
+    /**
+     * Returns the latest known completion instant.
+     *
+     * @return the completion instant, or null when it is unknown
+     */
+    public Instant getCompletedAt() {
+        return completedAt;
     }
 
     /**

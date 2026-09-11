@@ -1,5 +1,6 @@
 package duchess;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -7,6 +8,7 @@ import duchess.parser.Parser;
 import duchess.storage.Storage;
 import duchess.task.Task;
 import duchess.task.TaskList;
+import duchess.task.TaskStatistics;
 import duchess.ui.Ui;
 
 /** Coordinates Duchess's task commands and provides responses to user interfaces. */
@@ -20,6 +22,7 @@ public class Duchess {
     private static final String COMMAND_TYPE_LIST = "list";
     private static final String COMMAND_TYPE_MARK = "mark";
     private static final String COMMAND_TYPE_OTHER = "other";
+    private static final String COMMAND_TYPE_STATS = "stats";
     private static final String COMMAND_TYPE_UNMARK = "unmark";
     private static final String SAVE_ERROR = "OOPS!!! I couldn't save your task list to disk.";
     private static final String HELP_RESPONSE = """
@@ -29,6 +32,7 @@ public class Duchess {
                                              Add a deadline task using yyyy-MM-dd.
             event <description> /at <time>  Add an event task.
             list                              Show all tasks.
+            stats                             Show task statistics.
             find <keyword>                   Find tasks by keyword.
             mark <task number>               Mark a task as done.
             unmark <task number>             Mark a task as not done.
@@ -51,16 +55,26 @@ public class Duchess {
     /** Records whether the user has issued the {@code bye} command. */
     private boolean exitRequested;
 
+    /** Supplies the current instant for completion timestamps and statistics. */
+    private final Clock clock;
+
     /** Creates a Duchess application using the default storage location. */
     public Duchess() {
-        this(new Storage(), null);
+        this(new Storage(), null, Clock.systemUTC());
     }
 
     /** Creates a Duchess instance with collaborators supplied by a test. */
     Duchess(Storage storage, TaskList tasks) {
+        this(storage, tasks, Clock.systemUTC());
+    }
+
+    /** Creates a Duchess instance with collaborators and a clock supplied by a test. */
+    Duchess(Storage storage, TaskList tasks, Clock clock) {
         assert storage != null : "Duchess requires a storage collaborator";
+        assert clock != null : "Duchess requires a clock";
         this.storage = storage;
         this.tasks = tasks == null ? storage.loadTasks() : tasks;
+        this.clock = clock;
         commandType = COMMAND_TYPE_OTHER;
     }
 
@@ -109,6 +123,11 @@ public class Duchess {
             } else if (safeCommand.equalsIgnoreCase("list")) {
                 commandType = COMMAND_TYPE_LIST;
                 return formatTasks(tasks, "Here are the tasks in your list:");
+            } else if (safeCommand.equalsIgnoreCase("stats")) {
+                commandType = COMMAND_TYPE_STATS;
+                return formatStatistics();
+            } else if (lowerCaseCommand.startsWith("stats ")) {
+                throw new DuchessException("OOPS!!! Please use 'stats' without arguments.");
             } else if (lowerCaseCommand.startsWith("find ")) {
                 commandType = COMMAND_TYPE_FIND;
                 return findTasks(safeCommand);
@@ -180,7 +199,7 @@ public class Duchess {
         int taskIndex = Parser.parseTaskIndex(command, "mark ");
         validateTaskIndex(taskIndex);
 
-        tasks.markAsDone(taskIndex);
+        tasks.markAsDone(taskIndex, clock.instant());
         return withSaveWarning("Nice! I've marked this task as done:\n  " + tasks.get(taskIndex));
     }
 
@@ -230,6 +249,17 @@ public class Duchess {
             response.append('\n').append(i + 1).append('.').append(taskArray.get(i));
         }
         return response.toString();
+    }
+
+    /** Returns the formatted statistics response. */
+    private String formatStatistics() {
+        TaskStatistics statistics = tasks.getStatistics(clock.instant());
+        return "Task statistics:\n"
+                + "Total tasks: " + statistics.getTotalTasks() + "\n"
+                + "Completed tasks: " + statistics.getCompletedTasks() + "\n"
+                + "Incomplete tasks: " + statistics.getIncompleteTasks() + "\n"
+                + "Completed in the past 7 days: " + statistics.getRecentlyCompletedTasks() + "\n"
+                + "Completion rate: " + statistics.getCompletionRatePercentage() + "%";
     }
 
     /** Validates a zero-based task index. */
