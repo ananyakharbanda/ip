@@ -3,9 +3,11 @@ package duchess.task;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Instant;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
@@ -80,8 +82,62 @@ public class TaskListTest {
 
         assertAll(
                 () -> assertTrue(task.isDone()),
-                () -> assertEquals("X", task.getStatusIcon())
+                () -> assertEquals("X", task.getStatusIcon()),
+                () -> assertTrue(task.getCompletedAt() != null)
         );
+    }
+
+    /** Verifies that statistics count completed tasks only within the rolling seven-day window. */
+    @Test
+    public void taskList_getStatistics_countsCompletedAndRecentTasks() {
+        Instant now = Instant.parse("2026-09-11T00:00:00Z");
+        Task recentTask = new Todo("recent task");
+        recentTask.markAsDone(Instant.parse("2026-09-08T00:00:00Z"));
+        Task oldTask = new Todo("old task");
+        oldTask.markAsDone(Instant.parse("2026-09-03T23:59:59Z"));
+        Task incompleteTask = new Todo("incomplete task");
+        TaskList tasks = new TaskList(recentTask, oldTask, incompleteTask);
+
+        TaskStatistics statistics = tasks.getStatistics(now);
+
+        assertAll(
+                () -> assertEquals(3, statistics.getTotalTasks()),
+                () -> assertEquals(2, statistics.getCompletedTasks()),
+                () -> assertEquals(1, statistics.getIncompleteTasks()),
+                () -> assertEquals(1, statistics.getRecentlyCompletedTasks()),
+                () -> assertEquals(67, statistics.getCompletionRatePercentage())
+        );
+    }
+
+    /** Verifies that an unknown completion time is excluded from recent statistics. */
+    @Test
+    public void taskList_getStatistics_excludesCompletedTasksWithoutTimestamp() {
+        Instant now = Instant.parse("2026-09-11T00:00:00Z");
+        Task legacyTask = new Todo("legacy task");
+        legacyTask.markAsDone(null);
+        TaskList tasks = new TaskList(legacyTask);
+
+        TaskStatistics statistics = tasks.getStatistics(now);
+
+        assertAll(
+                () -> assertEquals(1, statistics.getCompletedTasks()),
+                () -> assertEquals(0, statistics.getRecentlyCompletedTasks()),
+                () -> assertEquals(100, statistics.getCompletionRatePercentage())
+        );
+    }
+
+    /** Verifies that marking an already completed task does not refresh its known timestamp. */
+    @Test
+    public void taskList_markAsDone_completedTaskKeepsOriginalTimestamp() {
+        Instant firstCompletion = Instant.parse("2026-09-01T00:00:00Z");
+        Instant secondCompletion = Instant.parse("2026-09-11T00:00:00Z");
+        Task task = new Todo("repeat task");
+        TaskList tasks = new TaskList(task);
+
+        tasks.markAsDone(0, firstCompletion);
+        tasks.markAsDone(0, secondCompletion);
+
+        assertEquals(firstCompletion, task.getCompletedAt());
     }
 
     /** Verifies that marking a task not done clears its completed state. */
@@ -96,7 +152,8 @@ public class TaskListTest {
 
         assertAll(
                 () -> assertFalse(task.isDone()),
-                () -> assertEquals(" ", task.getStatusIcon())
+                () -> assertEquals(" ", task.getStatusIcon()),
+                () -> assertNull(task.getCompletedAt())
         );
     }
 

@@ -5,10 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+
 import org.junit.jupiter.api.Test;
 
 import duchess.storage.Storage;
+import duchess.task.Task;
 import duchess.task.TaskList;
+import duchess.task.Todo;
 
 /** Tests the command-response boundary shared by the CLI and JavaFX interfaces. */
 public class DuchessTest {
@@ -59,5 +65,37 @@ public class DuchessTest {
                 () -> assertEquals("bye", duchess.getCommandType()),
                 () -> assertTrue(duchess.isExitRequested())
         );
+    }
+
+    /** Verifies that statistics use the injected current time and exact response format. */
+    @Test
+    public void getResponse_statsCommand_returnsStatistics() {
+        Instant now = Instant.parse("2026-09-11T00:00:00Z");
+        Task completedTask = new Todo("completed task");
+        TaskList tasks = new TaskList(completedTask, new Todo("pending task"));
+        Duchess duchess = new Duchess(new Storage(), tasks, Clock.fixed(now, ZoneOffset.UTC));
+
+        duchess.getResponse("mark 1");
+        String response = duchess.getResponse("STATS");
+
+        assertAll(
+                () -> assertEquals("Task statistics:\n"
+                        + "Total tasks: 2\n"
+                        + "Completed tasks: 1\n"
+                        + "Incomplete tasks: 1\n"
+                        + "Completed in the past 7 days: 1\n"
+                        + "Completion rate: 50%", response),
+                () -> assertEquals("stats", duchess.getCommandType())
+        );
+    }
+
+    /** Verifies that the stats command rejects arguments instead of silently ignoring them. */
+    @Test
+    public void getResponse_statsCommandWithArguments_returnsHelpfulError() {
+        Duchess duchess = new Duchess(new Storage(), new TaskList());
+
+        String response = duchess.getResponse("stats today");
+
+        assertEquals("OOPS!!! Please use 'stats' without arguments.", response);
     }
 }

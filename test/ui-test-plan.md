@@ -775,3 +775,92 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## Test case 16: Display task statistics and reject arguments
+
+Aim: Verify that `stats` reports task totals, recent completions, and the
+completion rate, and that arguments are rejected.
+
+Inputs:
+```text
+todo recent task
+todo pending task
+mark 1
+stats
+stats today
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] recent task
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] pending task
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] recent task
+____________________________________________________________
+____________________________________________________________
+Task statistics:
+Total tasks: 2
+Completed tasks: 1
+Incomplete tasks: 1
+Completed in the past 7 days: 1
+Completion rate: 50%
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Please use 'stats' without arguments.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 17: Load legacy completed task statistics
+
+Aim: Verify that a completed task from the legacy storage format remains
+loadable and is counted as completed but not as completed in the past seven
+days.
+
+Initial data file:
+```text
+T|1|Y3MyMTAw
+```
+
+Inputs:
+```text
+stats
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Task statistics:
+Total tasks: 1
+Completed tasks: 1
+Incomplete tasks: 0
+Completed in the past 7 days: 0
+Completion rate: 100%
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```

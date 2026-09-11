@@ -1,5 +1,7 @@
 package duchess.task;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
@@ -61,8 +63,19 @@ public class TaskList {
      * @param index the zero-based task index
      */
     public void markAsDone(int index) {
+        markAsDone(index, Instant.now());
+    }
+
+    /**
+     * Marks the task at a zero-based index as done at a specified instant.
+     *
+     * @param index the zero-based task index
+     * @param completionTime the completion instant
+     */
+    public void markAsDone(int index, Instant completionTime) {
         assertValidIndex(index);
-        tasks.get(index).markAsDone();
+        assert completionTime != null : "A completed task must have a completion instant";
+        tasks.get(index).markAsDone(completionTime);
     }
 
     /**
@@ -96,6 +109,32 @@ public class TaskList {
                 .filter(task -> task.getDescription().toLowerCase(Locale.ROOT)
                         .contains(lowerCaseKeyword))
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
+     * Returns statistics for the tasks at a specified instant.
+     *
+     * @param now the instant used as the end of the seven-day period
+     * @return statistics for the current task list
+     */
+    public TaskStatistics getStatistics(Instant now) {
+        assert now != null : "Statistics require a reference instant";
+        Instant periodStart = now.minus(7, ChronoUnit.DAYS);
+        int completedTasks = (int) tasks.stream()
+                .filter(Task::isDone)
+                .count();
+        int recentlyCompletedTasks = (int) tasks.stream()
+                .filter(task -> isCompletedWithin(task, periodStart, now))
+                .count();
+        return new TaskStatistics(tasks.size(), completedTasks, recentlyCompletedTasks);
+    }
+
+    /** Returns whether a task was completed within an inclusive time interval. */
+    private boolean isCompletedWithin(Task task, Instant periodStart, Instant periodEnd) {
+        Instant completedAt = task.getCompletedAt();
+        return task.isDone() && completedAt != null
+                && !completedAt.isBefore(periodStart)
+                && !completedAt.isAfter(periodEnd);
     }
 
     /** Documents the index precondition shared by operations on one task. */

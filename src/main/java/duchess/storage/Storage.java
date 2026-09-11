@@ -6,6 +6,8 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Objects;
@@ -103,14 +105,18 @@ public class Storage {
         String type = task.getType().getIcon();
         String status = task.isDone() ? "1" : "0";
         String description = encode(task.getDescription());
+        String completionTime = task.getCompletedAt() == null
+                ? "" : encode(task.getCompletedAt().toString());
 
         if (task instanceof Deadline deadline) {
-            return type + "|" + status + "|" + description + "|" + encode(deadline.getBy().toString());
+            return type + "|" + status + "|" + description + "|" + encode(deadline.getBy().toString())
+                    + "|" + completionTime;
         }
         if (task instanceof Event event) {
-            return type + "|" + status + "|" + description + "|" + encode(event.getAt());
+            return type + "|" + status + "|" + description + "|" + encode(event.getAt())
+                    + "|" + completionTime;
         }
-        return type + "|" + status + "|" + description;
+        return type + "|" + status + "|" + description + "|" + completionTime;
     }
 
     /** Encodes a text field without introducing record separators. */
@@ -142,9 +148,11 @@ public class Storage {
         }
 
         Task task;
-        if (fields[0].equals("T") && fields.length == 3) {
+        String completionField;
+        if (fields[0].equals("T") && (fields.length == 3 || fields.length == 4)) {
             task = new Todo(description);
-        } else if (fields[0].equals("D") && fields.length == 4) {
+            completionField = fields.length == 4 ? fields[3] : "";
+        } else if (fields[0].equals("D") && (fields.length == 4 || fields.length == 5)) {
             String by = decode(fields[3]);
             if (by == null || by.isBlank()) {
                 return null;
@@ -154,21 +162,36 @@ public class Storage {
             } catch (RuntimeException exception) {
                 return null;
             }
-        } else if (fields[0].equals("E") && fields.length == 4) {
+            completionField = fields.length == 5 ? fields[4] : "";
+        } else if (fields[0].equals("E") && (fields.length == 4 || fields.length == 5)) {
             String at = decode(fields[3]);
             if (at == null || at.isBlank()) {
                 return null;
             }
             task = new Event(description, at);
+            completionField = fields.length == 5 ? fields[4] : "";
         } else {
             return null;
         }
 
         assert task != null : "A valid record must produce a task";
         if (isDone) {
-            task.markAsDone();
+            task.markAsDone(decodeCompletionTime(completionField));
         }
         return task;
+    }
+
+    /** Decodes a completion timestamp, returning null when it is absent or invalid. */
+    private Instant decodeCompletionTime(String value) {
+        String decodedValue = decode(value);
+        if (decodedValue == null || decodedValue.isBlank()) {
+            return null;
+        }
+        try {
+            return Instant.parse(decodedValue);
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
     }
 
     /** Decodes a saved field, returning null when it is not valid Base64. */
