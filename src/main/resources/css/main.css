@@ -1,55 +1,108 @@
 .root {
-    app-background: #f7f8fc;
+    app-background: #f6f2ec;
     ink: #1d2433;
     muted-ink: #737b8c;
-    brand: #6c4bdc;
+    brand: #6b43b5;
+    royal-plum: #27153f;
+    royal-violet: #432267;
+    gold: #d3a545;
     -fx-background-color: app-background;
     -fx-font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
 }
 
 .app-shell {
-    -fx-background-color: app-background;
+    -fx-background-color: linear-gradient(to bottom, #f8f3ea, #f0ecf8);
 }
 
 .top-bar {
-    -fx-padding: 18px 20px 16px 20px;
-    -fx-background-color: linear-gradient(to right, #21183f, #3b286f);
-    -fx-effect: dropshadow(gaussian, rgba(34, 24, 67, 0.18), 12, 0.2, 0, 3);
+    -fx-padding: 18px 22px 16px 22px;
+    -fx-background-color: linear-gradient(to right, royal-plum, royal-violet);
+    -fx-border-color: transparent transparent gold transparent;
+    -fx-border-width: 0 0 2px 0;
+    -fx-effect: dropshadow(gaussian, rgba(34, 24, 67, 0.24), 14, 0.22, 0, 4);
 }
 
 .brand-icon {
-    -fx-min-width: 42px;
-    -fx-min-height: 42px;
+    -fx-min-width: 44px;
+    -fx-min-height: 44px;
     -fx-alignment: center;
-    -fx-background-color: #8a6be8;
+    -fx-background-color: linear-gradient(to bottom right, #f4d991, #ad761e);
     -fx-background-radius: 14px;
-    -fx-font-size: 22px;
+    -fx-border-color: #f8e6ae;
+    -fx-border-radius: 14px;
+    -fx-border-width: 1px;
+    -fx-font-size: 23px;
 }
 
 .brand-title {
     -fx-background-color: transparent;
     -fx-text-fill: white;
-    -fx-font-size: 20px;
+    -fx-font-family: "Georgia";
+    -fx-font-size: 21px;
     -fx-font-weight: bold;
 }
 
 .brand-subtitle {
     -fx-background-color: transparent;
-    -fx-text-fill: #d7cef8;
+    -fx-text-fill: #e4d6f8;
     -fx-font-size: 11px;
 }
 
 .status-pill {
-    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-color: rgba(255, 255, 255, 0.11);
     -fx-background-radius: 20px;
-    -fx-padding: 7px 10px;
-    -fx-text-fill: #e7ddff;
+    -fx-border-color: rgba(244, 217, 145, 0.45);
+    -fx-border-radius: 20px;
+    -fx-padding: 7px 11px;
+    -fx-text-fill: #f5df9c;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
 }
 
-.status-pill:disabled {
-    -fx-opacity: 1;
+.status-success {
+    -fx-text-fill: #b9f0cb;
+}
+
+.status-warning {
+    -fx-text-fill: #ffd49a;
+}
+
+.status-muted {
+    -fx-text-fill: #d4cbe6;
+}
+
+.quick-actions {
+    -fx-padding: 8px 12px;
+    -fx-background-color: rgba(255, 255, 255, 0.78);
+    -fx-background-radius: 12px;
+    -fx-border-color: rgba(211, 165, 69, 0.30);
+    -fx-border-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(67, 47, 95, 0.08), 8, 0.14, 0, 2);
+}
+
+.section-caption {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b6a2b;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+
+.quick-button {
+    -fx-background-color: #fbfafc;
+    -fx-background-radius: 9px;
+    -fx-border-color: #ded7e9;
+    -fx-border-radius: 9px;
+    -fx-padding: 7px 10px;
+    -fx-text-fill: #51306e;
+}
+
+.quick-button:hover {
+    -fx-background-color: #f0eaff;
+    -fx-border-color: #aa90d4;
+}
+
+.quick-button:pressed {
+    -fx-background-color: #e3d8fa;
 }
 
 .conversation-scroll,
@@ -57,6 +110,10 @@
     -fx-background-color: transparent;
     -fx-background-insets: 0;
     -fx-padding: 0;
+}
+
+#dialogContainer {
+    -fx-padding: 12px 0 20px 0;
 }
 
 .conversation-scroll > .corner {
@@ -85,16 +142,16 @@
 }
 
 .composer {
-    -fx-padding: 10px;
-    -fx-background-color: white;
+    -fx-padding: 10px 12px;
+    -fx-background-color: rgba(255, 255, 255, 0.94);
     -fx-background-radius: 16px;
-    -fx-border-color: #e4e6ef;
+    -fx-border-color: #ded5e8;
     -fx-border-radius: 16px;
-    -fx-effect: dropshadow(gaussian, rgba(46, 52, 70, 0.12), 14, 0.2, 0, 4);
+    -fx-effect: dropshadow(gaussian, rgba(46, 37, 70, 0.16), 14, 0.2, 0, 4);
 }
 
 .text-field {
-    -fx-background-color: #f5f6fa;
+    -fx-background-color: #f7f4f9;
     -fx-background-radius: 11px;
     -fx-border-color: transparent;
     -fx-border-radius: 11px;
@@ -106,7 +163,7 @@
 
 .text-field:focused {
     -fx-background-color: white;
-    -fx-border-color: #a996ee;
+    -fx-border-color: #b79bdc;
     -fx-border-width: 1px;
 }
 
@@ -124,11 +181,11 @@
 }
 
 .primary-button:hover {
-    -fx-background-color: #8064e5;
+    -fx-background-color: #8157c9;
 }
 
 .primary-button:pressed {
-    -fx-background-color: #5438b7;
+    -fx-background-color: #512d8e;
 }
 
 .secondary-button {

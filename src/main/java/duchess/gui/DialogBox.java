@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 /** Represents one chat message and its speaker avatar. */
 public class DialogBox extends HBox {
@@ -16,10 +17,16 @@ public class DialogBox extends HBox {
     private Label dialog;
 
     @FXML
+    private Label speakerLabel;
+
+    @FXML
+    private VBox messageColumn;
+
+    @FXML
     private ImageView displayPicture;
 
     /** Loads the reusable dialog layout and fills it with the message content. */
-    private DialogBox(String text, Image image) {
+    private DialogBox(String text, Image image, String speaker) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
             fxmlLoader.setController(this);
@@ -31,6 +38,7 @@ public class DialogBox extends HBox {
         }
 
         dialog.setText(text);
+        speakerLabel.setText(speaker);
         displayPicture.setImage(image);
     }
 
@@ -42,7 +50,9 @@ public class DialogBox extends HBox {
      * @return a dialog box containing the user message
      */
     public static DialogBox getUserDialog(String text, Image image) {
-        return new DialogBox(text, image);
+        DialogBox dialogBox = new DialogBox(text, image, "YOU");
+        dialogBox.getStyleClass().add("user-row");
+        return dialogBox;
     }
 
     /**
@@ -54,7 +64,8 @@ public class DialogBox extends HBox {
      * @return a dialog box containing Duchess's response
      */
     public static DialogBox getDuchessDialog(String text, Image image, String commandType) {
-        DialogBox dialogBox = new DialogBox(text, image);
+        DialogBox dialogBox = new DialogBox(text, image, "DUCHESS");
+        dialogBox.getStyleClass().add("duchess-row");
         dialogBox.flip();
         dialogBox.changeDialogStyle(commandType);
         return dialogBox;
@@ -62,7 +73,7 @@ public class DialogBox extends HBox {
 
     /** Flips the avatar and text so Duchess's response appears on the left. */
     private void flip() {
-        getChildren().setAll(displayPicture, dialog);
+        getChildren().setAll(displayPicture, messageColumn);
         setAlignment(Pos.TOP_LEFT);
         dialog.getStyleClass().add("reply-label");
     }

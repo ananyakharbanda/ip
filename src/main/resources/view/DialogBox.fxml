@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
 <fx:root alignment="TOP_RIGHT"
          styleClass="dialog-row"
@@ -14,7 +15,10 @@
          xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Label fx:id="dialog" text="Label" wrapText="true" minHeight="-Infinity" maxWidth="380.0" />
+        <VBox fx:id="messageColumn" spacing="3.0" maxWidth="400.0">
+            <Label fx:id="speakerLabel" text="DUCHESS" styleClass="speaker-label" />
+            <Label fx:id="dialog" text="Label" wrapText="true" minHeight="-Infinity" maxWidth="380.0" />
+        </VBox>
         <ImageView fx:id="displayPicture"
                    fitHeight="40.0"
                    fitWidth="40.0"

@@ -87,6 +87,24 @@ public class MainWindow extends AnchorPane {
         submitCommand("help");
     }
 
+    /** Shows the current task list from the quick-command strip. */
+    @FXML
+    private void handleList() {
+        submitCommand("list");
+    }
+
+    /** Places a todo command starter in the composer for quick task entry. */
+    @FXML
+    private void handleTodo() {
+        prepareCommand("todo ");
+    }
+
+    /** Places a find command starter in the composer for quick searching. */
+    @FXML
+    private void handleFind() {
+        prepareCommand("find ");
+    }
+
     /** Sends a command through the shared processor and appends the conversation bubbles. */
     private void submitCommand(String input) {
         String response = duchess.getResponse(input);
@@ -105,15 +123,41 @@ public class MainWindow extends AnchorPane {
         }
     }
 
+    /** Places a command starter in the input field and returns focus to the composer. */
+    private void prepareCommand(String commandStarter) {
+        userInput.setText(commandStarter);
+        userInput.positionCaret(commandStarter.length());
+        userInput.requestFocus();
+    }
+
     /** Updates the compact header status to reflect the latest command result. */
     private void updateStatus(String commandType) {
+        statusLabel.getStyleClass().removeAll("status-ready", "status-success", "status-warning", "status-muted");
         String status = switch (commandType) {
-            case "add", "mark", "unmark" -> "● Updated";
-            case "delete" -> "● Removed";
-            case "error" -> "● Check input";
-            case "bye" -> "● See you soon";
-            case "help" -> "● Guide open";
-            default -> "● Ready";
+            case "add", "mark", "unmark" -> {
+                statusLabel.getStyleClass().add("status-success");
+                yield "✦ Court updated";
+            }
+            case "delete" -> {
+                statusLabel.getStyleClass().add("status-success");
+                yield "✦ Record removed";
+            }
+            case "error" -> {
+                statusLabel.getStyleClass().add("status-warning");
+                yield "! Check command";
+            }
+            case "bye" -> {
+                statusLabel.getStyleClass().add("status-muted");
+                yield "✦ See you soon";
+            }
+            case "help" -> {
+                statusLabel.getStyleClass().add("status-ready");
+                yield "✦ Guide open";
+            }
+            default -> {
+                statusLabel.getStyleClass().add("status-ready");
+                yield "✦ Palace ready";
+            }
         };
         statusLabel.setText(status);
     }
