@@ -2,36 +2,25 @@ package duchess.gui;
 
 import duchess.Duchess;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 /** Controller for the main Duchess chat window. */
 public class MainWindow extends AnchorPane {
     @FXML
-    private ScrollPane scrollPane;
+    private Header header;
 
     @FXML
-    private VBox dialogContainer;
+    private QuickCommands quickCommands;
 
     @FXML
-    private TextField userInput;
+    private ConversationView conversationView;
 
     @FXML
-    private Button sendButton;
-
-    @FXML
-    private Button helpButton;
-
-    @FXML
-    private Label statusLabel;
+    private Composer composer;
 
     /** The shared command processor used by the GUI. */
     private Duchess duchess;
@@ -45,7 +34,11 @@ public class MainWindow extends AnchorPane {
     /** Configures automatic scrolling after a new dialog is added. */
     @FXML
     public void initialize() {
-        dialogContainer.heightProperty().addListener(observable -> scrollPane.setVvalue(1.0));
+        header.setHelpAction(this::handleHelp);
+        quickCommands.setListAction(this::handleList);
+        quickCommands.setTodoAction(this::handleTodo);
+        quickCommands.setFindAction(this::handleFind);
+        composer.setSubmitAction(this::handleUserInput);
     }
 
     /**
@@ -55,11 +48,10 @@ public class MainWindow extends AnchorPane {
      */
     public void setDuchess(Duchess duchess) {
         this.duchess = duchess;
-        dialogContainer.getChildren().add(
+        conversationView.addDialogs(
                 DialogBox.getDuchessDialog("👋 Hello! I'm Duchess.\n\nType help or click Help to "
-                                + "see the available commands.",
-                        duchessImage, "welcome"));
-        userInput.requestFocus();
+                                + "see the available commands.", duchessImage, "welcome"));
+        composer.requestInputFocus();
     }
 
     /** Creates a simple in-memory avatar so the GUI has no external image dependency. */
@@ -76,31 +68,26 @@ public class MainWindow extends AnchorPane {
     }
 
     /** Sends the current text to Duchess and appends both sides of the conversation. */
-    @FXML
     private void handleUserInput() {
-        submitCommand(userInput.getText());
+        submitCommand(composer.getInput());
     }
 
     /** Displays the command guide when the GUI Help button is pressed. */
-    @FXML
     private void handleHelp() {
         submitCommand("help");
     }
 
     /** Shows the current task list from the quick-command strip. */
-    @FXML
     private void handleList() {
         submitCommand("list");
     }
 
     /** Places a todo command starter in the composer for quick task entry. */
-    @FXML
     private void handleTodo() {
         prepareCommand("todo ");
     }
 
     /** Places a find command starter in the composer for quick searching. */
-    @FXML
     private void handleFind() {
         prepareCommand("find ");
     }
@@ -110,55 +97,44 @@ public class MainWindow extends AnchorPane {
         String response = duchess.getResponse(input);
         String commandType = duchess.getCommandType();
 
-        dialogContainer.getChildren().addAll(
+        conversationView.addDialogs(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getDuchessDialog(response, duchessImage, commandType));
         updateStatus(commandType);
-        userInput.clear();
+        composer.clearInput();
 
         if (duchess.isExitRequested()) {
-            userInput.setDisable(true);
-            sendButton.setDisable(true);
-            helpButton.setDisable(true);
+            composer.setInputDisabled(true);
+            header.setHelpDisabled(true);
         }
     }
 
     /** Places a command starter in the input field and returns focus to the composer. */
     private void prepareCommand(String commandStarter) {
-        userInput.setText(commandStarter);
-        userInput.positionCaret(commandStarter.length());
-        userInput.requestFocus();
+        composer.prepareInput(commandStarter);
     }
 
     /** Updates the compact header status to reflect the latest command result. */
     private void updateStatus(String commandType) {
-        statusLabel.getStyleClass().removeAll("status-ready", "status-success", "status-warning", "status-muted");
-        String status = switch (commandType) {
+        switch (commandType) {
             case "add", "mark", "unmark" -> {
-                statusLabel.getStyleClass().add("status-success");
-                yield "✦ Court updated";
+                header.updateStatus("✦ Court updated", "status-success");
             }
             case "delete" -> {
-                statusLabel.getStyleClass().add("status-success");
-                yield "✦ Record removed";
+                header.updateStatus("✦ Record removed", "status-success");
             }
             case "error" -> {
-                statusLabel.getStyleClass().add("status-warning");
-                yield "! Check command";
+                header.updateStatus("! Check command", "status-warning");
             }
             case "bye" -> {
-                statusLabel.getStyleClass().add("status-muted");
-                yield "✦ See you soon";
+                header.updateStatus("✦ See you soon", "status-muted");
             }
             case "help" -> {
-                statusLabel.getStyleClass().add("status-ready");
-                yield "✦ Guide open";
+                header.updateStatus("✦ Guide open", "status-ready");
             }
             default -> {
-                statusLabel.getStyleClass().add("status-ready");
-                yield "✦ Palace ready";
+                header.updateStatus("✦ Palace ready", "status-ready");
             }
-        };
-        statusLabel.setText(status);
+        }
     }
 }
