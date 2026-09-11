@@ -3,6 +3,7 @@ package duchess.gui;
 import duchess.Duchess;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -29,14 +30,17 @@ public class MainWindow extends AnchorPane {
     @FXML
     private Button helpButton;
 
+    @FXML
+    private Label statusLabel;
+
     /** The shared command processor used by the GUI. */
     private Duchess duchess;
 
     /** Avatar shown beside user messages. */
-    private final Image userImage = createAvatar(Color.web("#2864A8"));
+    private final Image userImage = createAvatar(Color.web("#5367A7"));
 
     /** Avatar shown beside Duchess responses. */
-    private final Image duchessImage = createAvatar(Color.web("#7A4EAB"));
+    private final Image duchessImage = createAvatar(Color.web("#6C4BDC"));
 
     /** Configures automatic scrolling after a new dialog is added. */
     @FXML
@@ -52,9 +56,10 @@ public class MainWindow extends AnchorPane {
     public void setDuchess(Duchess duchess) {
         this.duchess = duchess;
         dialogContainer.getChildren().add(
-                DialogBox.getDuchessDialog("Hello! I'm Duchess.\nType help or click Help to see "
-                                + "the available commands.",
+                DialogBox.getDuchessDialog("👋 Hello! I'm Duchess.\n\nType help or click Help to "
+                                + "see the available commands.",
                         duchessImage, "welcome"));
+        userInput.requestFocus();
     }
 
     /** Creates a simple in-memory avatar so the GUI has no external image dependency. */
@@ -82,6 +87,24 @@ public class MainWindow extends AnchorPane {
         submitCommand("help");
     }
 
+    /** Shows the current task list from the quick-command strip. */
+    @FXML
+    private void handleList() {
+        submitCommand("list");
+    }
+
+    /** Places a todo command starter in the composer for quick task entry. */
+    @FXML
+    private void handleTodo() {
+        prepareCommand("todo ");
+    }
+
+    /** Places a find command starter in the composer for quick searching. */
+    @FXML
+    private void handleFind() {
+        prepareCommand("find ");
+    }
+
     /** Sends a command through the shared processor and appends the conversation bubbles. */
     private void submitCommand(String input) {
         String response = duchess.getResponse(input);
@@ -90,6 +113,7 @@ public class MainWindow extends AnchorPane {
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getDuchessDialog(response, duchessImage, commandType));
+        updateStatus(commandType);
         userInput.clear();
 
         if (duchess.isExitRequested()) {
@@ -97,5 +121,44 @@ public class MainWindow extends AnchorPane {
             sendButton.setDisable(true);
             helpButton.setDisable(true);
         }
+    }
+
+    /** Places a command starter in the input field and returns focus to the composer. */
+    private void prepareCommand(String commandStarter) {
+        userInput.setText(commandStarter);
+        userInput.positionCaret(commandStarter.length());
+        userInput.requestFocus();
+    }
+
+    /** Updates the compact header status to reflect the latest command result. */
+    private void updateStatus(String commandType) {
+        statusLabel.getStyleClass().removeAll("status-ready", "status-success", "status-warning", "status-muted");
+        String status = switch (commandType) {
+            case "add", "mark", "unmark" -> {
+                statusLabel.getStyleClass().add("status-success");
+                yield "✦ Court updated";
+            }
+            case "delete" -> {
+                statusLabel.getStyleClass().add("status-success");
+                yield "✦ Record removed";
+            }
+            case "error" -> {
+                statusLabel.getStyleClass().add("status-warning");
+                yield "! Check command";
+            }
+            case "bye" -> {
+                statusLabel.getStyleClass().add("status-muted");
+                yield "✦ See you soon";
+            }
+            case "help" -> {
+                statusLabel.getStyleClass().add("status-ready");
+                yield "✦ Guide open";
+            }
+            default -> {
+                statusLabel.getStyleClass().add("status-ready");
+                yield "✦ Palace ready";
+            }
+        };
+        statusLabel.setText(status);
     }
 }
