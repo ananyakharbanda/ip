@@ -3,6 +3,8 @@ package duchess;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import duchess.parser.Parser;
 import duchess.storage.Storage;
@@ -235,20 +237,16 @@ public class Duchess {
 
     /** Formats a task collection using the same numbering as the CLI. */
     private String formatTasks(TaskList taskList, String heading) {
-        ArrayList<Task> taskArray = new ArrayList<>();
-        for (int i = 0; i < taskList.size(); i++) {
-            taskArray.add(taskList.get(i));
-        }
-        return formatTasks(taskArray, heading);
+        return taskList.size() == 0 ? heading : IntStream.range(0, taskList.size())
+                .mapToObj(index -> (index + 1) + "." + taskList.get(index))
+                .collect(Collectors.joining("\n", heading + "\n", ""));
     }
 
     /** Formats a list of tasks using one-based indexes. */
     private String formatTasks(ArrayList<Task> taskArray, String heading) {
-        StringBuilder response = new StringBuilder(heading);
-        for (int i = 0; i < taskArray.size(); i++) {
-            response.append('\n').append(i + 1).append('.').append(taskArray.get(i));
-        }
-        return response.toString();
+        return taskArray.isEmpty() ? heading : IntStream.range(0, taskArray.size())
+                .mapToObj(index -> (index + 1) + "." + taskArray.get(index))
+                .collect(Collectors.joining("\n", heading + "\n", ""));
     }
 
     /** Returns the formatted statistics response. */

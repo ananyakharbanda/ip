@@ -27,11 +27,15 @@ tracks whether the task is done, and provides methods such as `markAsDone()` and
   program calls methods on a `Task` object instead of using a string directly.
 - **Requires understanding classes:** Beginners must understand object creation,
   fields, and methods before modifying task behavior.
-- **Does not solve every design issue:** The current program still uses a fixed-
-  size array and keeps all tasks in memory only while the program runs.
+- **Does not solve every design issue:** `Task` models an individual task, but
+  collection ordering and persistence still belong to `TaskList` and `Storage`.
+  Keeping those responsibilities separate means a change to file storage does
+  not need to change the task subclasses.
 
 ## Conclusion
 
 For Duchess, using a `Task` class is worthwhile because task data and behavior
-belong together. The small amount of extra code makes the program clearer and
-provides a better foundation for future task features.
+belong together. `Todo`, `Deadline`, and `Event` specialize the shared model,
+while `TaskList` manages ordering and `Storage` manages persistence. The small
+amount of extra code makes the program clearer and provides a better foundation
+for future task features.

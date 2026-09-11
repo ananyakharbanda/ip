@@ -26,10 +26,27 @@ import duchess.task.Todo;
  */
 public class Storage {
     /** The relative location used for Duchess's saved task list. */
-    private static final Path DATA_FILE = Path.of("data", "duchess.txt");
+    private static final Path DEFAULT_DATA_FILE = Path.of("data", "duchess.txt");
+
+    /** The file used to persist this storage service's task list. */
+    private final Path dataFile;
 
     /** Creates a storage service that uses Duchess's default data file. */
     public Storage() {
+        this(DEFAULT_DATA_FILE);
+    }
+
+    /**
+     * Creates a storage service that uses the supplied data file.
+     *
+     * <p>Allowing the path to be supplied keeps production storage convenient
+     * while making isolated persistence tests possible.</p>
+     *
+     * @param dataFile the file used to load and save tasks
+     */
+    public Storage(Path dataFile) {
+        assert dataFile != null : "Storage requires a data-file path";
+        this.dataFile = dataFile;
     }
 
     /**
@@ -43,12 +60,12 @@ public class Storage {
      *         or cannot be read
      */
     public TaskList loadTasks() {
-        if (!Files.isRegularFile(DATA_FILE)) {
+        if (!Files.isRegularFile(dataFile)) {
             return new TaskList();
         }
 
         try {
-            Task[] tasks = Files.readAllLines(DATA_FILE, StandardCharsets.UTF_8).stream()
+            Task[] tasks = Files.readAllLines(dataFile, StandardCharsets.UTF_8).stream()
                     .map(this::deserialize)
                     .filter(Objects::nonNull)
                     .toArray(Task[]::new);
@@ -71,7 +88,10 @@ public class Storage {
      */
     public void saveTasks(TaskList tasks) throws IOException {
         assert tasks != null : "Storage requires a task list to save";
-        Path parent = DATA_FILE.getParent();
+        Path parent = dataFile.getParent();
+        if (parent == null) {
+            parent = Path.of(".");
+        }
         Files.createDirectories(parent);
         Path temporaryFile = Files.createTempFile(parent, "duchess", ".tmp");
 
@@ -82,10 +102,10 @@ public class Storage {
             }
             Files.write(temporaryFile, lines, StandardCharsets.UTF_8);
             try {
-                Files.move(temporaryFile, DATA_FILE, StandardCopyOption.REPLACE_EXISTING,
+                Files.move(temporaryFile, dataFile, StandardCopyOption.REPLACE_EXISTING,
                         StandardCopyOption.ATOMIC_MOVE);
             } catch (AtomicMoveNotSupportedException exception) {
-                Files.move(temporaryFile, DATA_FILE, StandardCopyOption.REPLACE_EXISTING);
+                Files.move(temporaryFile, dataFile, StandardCopyOption.REPLACE_EXISTING);
             }
         } finally {
             Files.deleteIfExists(temporaryFile);
