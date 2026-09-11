@@ -1,0 +1,20 @@
+// Shared quality settings for local builds and continuous integration.
+
+checkstyle {
+    // Keep this version aligned with the version used by IntelliJ's Checkstyle plugin.
+    toolVersion = '14.1.0'
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+
+        showExceptions = true
+        exceptionFormat = 'full'
+        showCauses = true
+        showStackTraces = true
+        showStandardStreams = false
+    }
+}
