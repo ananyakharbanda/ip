@@ -4,30 +4,30 @@
 <?import duchess.gui.ConversationView?>
 <?import duchess.gui.Header?>
 <?import duchess.gui.QuickCommands?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="680.0" prefWidth="520.0"
-            xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="duchess.gui.MainWindow"
-            styleClass="app-shell">
+<VBox prefHeight="680.0" prefWidth="520.0" minHeight="560.0" minWidth="420.0" spacing="0.0"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="duchess.gui.MainWindow"
+      styleClass="app-shell">
     <children>
-        <Header fx:id="header"
-                AnchorPane.leftAnchor="0.0"
-                AnchorPane.rightAnchor="0.0"
-                AnchorPane.topAnchor="0.0" />
-        <QuickCommands fx:id="quickCommands"
-                        AnchorPane.leftAnchor="16.0"
-                        AnchorPane.rightAnchor="16.0"
-                        AnchorPane.topAnchor="82.0" />
-        <ConversationView fx:id="conversationView"
-                          AnchorPane.bottomAnchor="78.0"
-                          AnchorPane.leftAnchor="16.0"
-                          AnchorPane.rightAnchor="16.0"
-                          AnchorPane.topAnchor="132.0" />
-        <Composer fx:id="composer"
-                  AnchorPane.bottomAnchor="14.0"
-                  AnchorPane.leftAnchor="16.0"
-                  AnchorPane.rightAnchor="16.0" />
+        <Header fx:id="header" />
+        <QuickCommands fx:id="quickCommands">
+            <VBox.margin>
+                <Insets bottom="6.0" left="14.0" right="14.0" top="10.0" />
+            </VBox.margin>
+        </QuickCommands>
+        <ConversationView fx:id="conversationView" VBox.vgrow="ALWAYS">
+            <VBox.margin>
+                <Insets left="12.0" right="12.0" />
+            </VBox.margin>
+        </ConversationView>
+        <Composer fx:id="composer">
+            <VBox.margin>
+                <Insets bottom="14.0" left="14.0" right="14.0" top="8.0" />
+            </VBox.margin>
+        </Composer>
     </children>
-</AnchorPane>
+</VBox>

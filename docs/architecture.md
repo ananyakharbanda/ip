@@ -43,7 +43,7 @@ FXML-backed controls:
 - `ConversationView.fxml` for the scrolling conversation; and
 - `Composer.fxml` for the command field and Send button.
 
-`DialogBox.fxml` is also FXML-backed, but its text, speaker, avatar, and style
+`DialogBox.fxml` is also FXML-backed, but its text, speaker, and style
 are filled dynamically because they depend on each response. This division
 keeps layout in FXML while leaving changing application state in Java.
 

@@ -9,6 +9,6 @@
          xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1">
     <content>
-        <VBox fx:id="dialogContainer" alignment="TOP_CENTER" prefWidth="488.0" spacing="4.0" />
+        <VBox fx:id="dialogContainer" alignment="TOP_CENTER" fillWidth="true" spacing="2.0" />
     </content>
 </fx:root>

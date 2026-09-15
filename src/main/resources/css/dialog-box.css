@@ -1,46 +1,59 @@
 .dialog-row {
-    -fx-padding: 9px 4px;
-}
-
-.label {
-    -fx-background-color: #fffdf8;
-    -fx-border-color: #e1d9cb;
-    -fx-border-width: 1px;
-    -fx-background-radius: 16px 16px 16px 4px;
-    -fx-border-radius: 16px 16px 16px 4px;
-    -fx-padding: 12px 15px;
-    -fx-text-fill: #2e3545;
-    -fx-font-size: 13px;
-    -fx-line-spacing: 2px;
-    -fx-border-insets: 0 7px 0 7px;
-    -fx-background-insets: 0 7px 0 7px;
-    -fx-effect: dropshadow(gaussian, rgba(53, 43, 74, 0.10), 9, 0.15, 0, 2);
+    -fx-padding: 5px 2px;
 }
 
 .speaker-label {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-effect: null;
-    -fx-padding: 0 9px 0 9px;
+    -fx-padding: 0 10px;
     -fx-font-size: 9px;
     -fx-font-weight: bold;
     -fx-background-insets: 0;
     -fx-border-insets: 0;
 }
 
-.user-row .speaker-label {
-    -fx-text-fill: #6f578d;
+.user-row {
+    -fx-alignment: TOP_RIGHT;
+    -fx-padding: 3px 2px 3px 64px;
+}
+
+.user-row .message-column {
     -fx-alignment: CENTER_RIGHT;
 }
 
-.duchess-row .speaker-label {
-    -fx-text-fill: #a17827;
+.user-row .speaker-label {
+    -fx-text-fill: #6f6780;
+    -fx-alignment: CENTER_RIGHT;
 }
 
-.reply-label {
-    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f3edff);
-    -fx-background-radius: 16px 16px 4px 16px;
-    -fx-border-radius: 16px 16px 4px 16px;
+.dialog-label {
+    -fx-background-color: #fffdf8;
+    -fx-border-color: #e1d9cb;
+    -fx-border-width: 1px;
+    -fx-background-radius: 12px 12px 12px 3px;
+    -fx-border-radius: 12px 12px 12px 3px;
+    -fx-padding: 9px 12px;
+    -fx-text-fill: #2e3545;
+    -fx-font-size: 13px;
+    -fx-line-spacing: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(53, 43, 74, 0.08), 7, 0.12, 0, 1);
+}
+
+.user-row .dialog-label {
+    -fx-background-color: #e9e6f3;
+    -fx-border-color: #d5cee5;
+    -fx-background-radius: 12px 12px 3px 12px;
+    -fx-border-radius: 12px 12px 3px 12px;
+    -fx-text-fill: #39324a;
+}
+
+.duchess-row .speaker-label {
+    -fx-text-fill: #9b7324;
+}
+
+.duchess-row .dialog-label {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f4effc);
     -fx-border-color: #d8c8ed;
 }
 
@@ -59,6 +72,20 @@
     -fx-border-color: #efc0b4;
 }
 
-#displayPicture {
-    -fx-effect: dropshadow(gaussian, rgba(35, 39, 56, 0.18), 8, 0.5, 0, 2);
+.error-row {
+    -fx-padding: 5px 2px 8px 2px;
+}
+
+.error-row .speaker-label {
+    -fx-text-fill: #b23a43;
+}
+
+.error-label {
+    -fx-background-color: #fff0f0;
+    -fx-border-color: #e2a0a5;
+    -fx-border-width: 1px 1px 1px 4px;
+    -fx-background-radius: 4px 12px 12px 4px;
+    -fx-border-radius: 4px 12px 12px 4px;
+    -fx-text-fill: #812c35;
+    -fx-effect: dropshadow(gaussian, rgba(174, 59, 68, 0.14), 8, 0.18, 0, 2);
 }

@@ -6,7 +6,7 @@ import duchess.Duchess;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /** The JavaFX application that hosts Duchess's chat window. */
@@ -17,6 +17,12 @@ public class Main extends Application {
     /** The initial height of the chat window. */
     private static final double WINDOW_HEIGHT = 680.0;
 
+    /** The smallest width that keeps the command composer usable. */
+    private static final double MIN_WINDOW_WIDTH = 420.0;
+
+    /** The smallest height that keeps the conversation and composer visible. */
+    private static final double MIN_WINDOW_HEIGHT = 560.0;
+
     /**
      * Loads the FXML view, injects the Duchess command processor, and shows the window.
      *
@@ -26,7 +32,7 @@ public class Main extends Application {
     public void start(Stage stage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
-            AnchorPane root = fxmlLoader.load();
+            VBox root = fxmlLoader.load();
             Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             scene.getStylesheets().add(Main.class.getResource("/css/main.css").toExternalForm());
 
@@ -34,8 +40,9 @@ public class Main extends Application {
             controller.setDuchess(new Duchess());
 
             stage.setTitle("Duchess ✦ Royal Task Companion");
-            stage.setMinWidth(WINDOW_WIDTH);
-            stage.setMinHeight(WINDOW_HEIGHT);
+            stage.setMinWidth(MIN_WINDOW_WIDTH);
+            stage.setMinHeight(MIN_WINDOW_HEIGHT);
+            stage.setResizable(true);
             stage.setScene(scene);
             stage.show();
         } catch (IOException | NullPointerException exception) {

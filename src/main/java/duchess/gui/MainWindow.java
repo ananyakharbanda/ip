@@ -2,14 +2,10 @@ package duchess.gui;
 
 import duchess.Duchess;
 import javafx.fxml.FXML;
-import javafx.scene.image.Image;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.VBox;
 
 /** Controller for the main Duchess chat window. */
-public class MainWindow extends AnchorPane {
+public class MainWindow extends VBox {
     @FXML
     private Header header;
 
@@ -24,12 +20,6 @@ public class MainWindow extends AnchorPane {
 
     /** The shared command processor used by the GUI. */
     private Duchess duchess;
-
-    /** Avatar shown beside user messages. */
-    private final Image userImage = createAvatar(Color.web("#5367A7"));
-
-    /** Avatar shown beside Duchess responses. */
-    private final Image duchessImage = createAvatar(Color.web("#6C4BDC"));
 
     /** Configures automatic scrolling after a new dialog is added. */
     @FXML
@@ -50,21 +40,8 @@ public class MainWindow extends AnchorPane {
         this.duchess = duchess;
         conversationView.addDialogs(
                 DialogBox.getDuchessDialog("👋 Hello! I'm Duchess.\n\nType help or click Help to "
-                                + "see the available commands.", duchessImage, "welcome"));
+                                + "see the available commands.", "welcome"));
         composer.requestInputFocus();
-    }
-
-    /** Creates a simple in-memory avatar so the GUI has no external image dependency. */
-    private static Image createAvatar(Color background) {
-        WritableImage image = new WritableImage(48, 48);
-        PixelWriter writer = image.getPixelWriter();
-        for (int y = 0; y < 48; y++) {
-            for (int x = 0; x < 48; x++) {
-                double distance = Math.hypot(x - 23.5, y - 23.5);
-                writer.setColor(x, y, distance <= 23.5 ? background : Color.TRANSPARENT);
-            }
-        }
-        return image;
     }
 
     /** Sends the current text to Duchess and appends both sides of the conversation. */
@@ -98,8 +75,8 @@ public class MainWindow extends AnchorPane {
         String commandType = duchess.getCommandType();
 
         conversationView.addDialogs(
-                DialogBox.getUserDialog(input, userImage),
-                DialogBox.getDuchessDialog(response, duchessImage, commandType));
+                DialogBox.getUserDialog(input),
+                DialogBox.getDuchessDialog(response, commandType));
         updateStatus(commandType);
         composer.clearInput();
 
