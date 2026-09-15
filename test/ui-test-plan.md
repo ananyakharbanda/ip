@@ -864,3 +864,49 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## Test case 18: Use Duchess's royal steward voice
+
+Aim: Verify that the help response introduces Duchess's consistent personality
+before displaying the command guide.
+
+Inputs:
+```text
+help
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+Duchess's royal desk is open.
+I keep your plans polished and your priorities in order.
+
+Available commands:
+todo <description>              Add a todo task.
+deadline <description> /by <date>
+                                 Add a deadline task using yyyy-MM-dd.
+event <description> /at <time>  Add an event task.
+list                              Show all tasks.
+stats                             Show task statistics.
+find <keyword>                   Find tasks by keyword.
+mark <task number>               Mark a task as done.
+unmark <task number>             Mark a task as not done.
+delete <task number>             Delete a task.
+help                              Show this command guide.
+bye                               Exit Duchess.
+
+Commands are not case-sensitive.
+
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```

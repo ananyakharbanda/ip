@@ -1,8 +1,10 @@
 # Duchess ✦ Royal Task Companion
 
 Duchess is a Java 25 task manager with both a command-line interface and a
-JavaFX graphical interface. It supports todos, deadlines, events, searching,
-completion tracking, and completion statistics.
+JavaFX graphical interface. She is designed as a poised royal task steward:
+warm in tone, concise in her instructions, and fond of keeping plans in order.
+She supports todos, deadlines, events, searching, completion tracking, and
+completion statistics.
 
 ## Features
 

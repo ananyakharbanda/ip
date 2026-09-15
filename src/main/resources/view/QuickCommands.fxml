@@ -9,11 +9,11 @@
          xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Label text="QUICK COMMANDS" styleClass="section-caption" />
+        <Label text="ROYAL SHORTCUTS" styleClass="section-caption" />
         <Button mnemonicParsing="false" onAction="#handleList"
-                text="📋 View list" styleClass="quick-button" />
+                text="📋 Review list" styleClass="quick-button" />
         <Button mnemonicParsing="false" onAction="#handleTodo"
-                text="➕ Add todo" styleClass="quick-button" />
+                text="➕ New todo" styleClass="quick-button" />
         <Button mnemonicParsing="false" onAction="#handleFind"
                 text="🔎 Find" styleClass="quick-button" />
     </children>

@@ -28,6 +28,9 @@ public class Duchess {
     private static final String COMMAND_TYPE_UNMARK = "unmark";
     private static final String SAVE_ERROR = "OOPS!!! I couldn't save your task list to disk.";
     private static final String HELP_RESPONSE = """
+            Duchess's royal desk is open.
+            I keep your plans polished and your priorities in order.
+
             Available commands:
             todo <description>              Add a todo task.
             deadline <description> /by <date>

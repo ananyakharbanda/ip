@@ -58,6 +58,17 @@ public class DuchessTest {
         );
     }
 
+    /** Verifies that the help response communicates Duchess's royal steward personality. */
+    @Test
+    public void getResponse_helpCommand_usesRoyalStewardVoice() {
+        Duchess duchess = createDuchess(new TaskList());
+
+        String response = duchess.getResponse("help");
+
+        assertTrue(response.contains("Duchess's royal desk is open."));
+        assertTrue(response.contains("I keep your plans polished and your priorities in order."));
+    }
+
     /** Verifies that the GUI can process the command used to end a conversation. */
     @Test
     public void getResponse_byeCommand_requestsExit() {

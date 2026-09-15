@@ -1,8 +1,10 @@
 # Duchess User Guide
 
-Duchess is a task manager that supports todos, deadlines, events, searching,
-completion tracking, and completion statistics. The same command behavior is
-available from the command-line interface and the JavaFX graphical interface.
+Duchess is a task manager with the personality of a poised royal task steward.
+She keeps responses warm and concise while helping users manage todos,
+deadlines, events, searches, and completion statistics. The same command
+behavior is available from the command-line interface and the JavaFX graphical
+interface.
 
 ## Running Duchess
 
