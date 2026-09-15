@@ -35,7 +35,10 @@
     -fx-border-radius: 12px 12px 12px 3px;
     -fx-padding: 9px 12px;
     -fx-text-fill: #2e3545;
+    -fx-font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
     -fx-font-size: 13px;
+    -fx-font-style: normal;
+    -fx-font-weight: normal;
     -fx-line-spacing: 2px;
     -fx-effect: dropshadow(gaussian, rgba(53, 43, 74, 0.08), 7, 0.12, 0, 1);
 }

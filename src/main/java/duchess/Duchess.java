@@ -31,19 +31,21 @@ public class Duchess {
             The squad desk is open.
             I'll keep the banter light and your case file organized.
 
-            Available commands:
-            todo <description>              Add a todo task.
-            deadline <description> /by <date>
-                                             Add a deadline task using yyyy-MM-dd.
-            event <description> /at <time>  Add an event task.
-            list                              Show all tasks.
-            stats                             Show task statistics.
-            find <keyword>                   Find tasks by keyword.
-            mark <task number>               Mark a task as done.
-            unmark <task number>             Mark a task as not done.
-            delete <task number>             Delete a task.
-            help                              Show this command guide.
-            bye                               Exit Duchess.
+            Squad playbook:
+            • todo <description> — Add a todo task.
+              case <description> — Squad alias for todo.
+            • deadline <description> /by <date> — Add a deadline task.
+              timer <description> /by <date> — Squad alias for deadline.
+            • event <description> /at <time> — Add an event task.
+              briefing <description> /at <time> — Squad alias for event.
+            • list / rollcall — Show all tasks.
+            • stats / report — Show task statistics.
+            • find <keyword> / intel <keyword> — Find tasks by keyword.
+            • mark <task number> / close <task number> — Mark a task done.
+            • unmark <task number> / reopen <task number> — Reopen a task.
+            • delete <task number> / archive <task number> — Delete a task.
+            • help / brief — Show this playbook.
+            • bye / signoff — Exit Duchess.
 
             Commands are not case-sensitive.
             """;
@@ -112,7 +114,7 @@ public class Duchess {
      * @return the response that should be displayed to the user
      */
     public String getResponse(String command) {
-        String safeCommand = command == null ? "" : command;
+        String safeCommand = normalizeAlias(command == null ? "" : command);
         String lowerCaseCommand = safeCommand.toLowerCase(Locale.ROOT);
 
         if (safeCommand.equalsIgnoreCase("bye")) {
@@ -168,6 +170,30 @@ public class Duchess {
             commandType = COMMAND_TYPE_ERROR;
             return exception.getMessage();
         }
+    }
+
+    /** Converts squad-room command aliases into the canonical command names. */
+    private String normalizeAlias(String command) {
+        String lowerCaseCommand = command.toLowerCase(Locale.ROOT);
+        String[][] aliases = {
+            {"rollcall", "list"},
+            {"report", "stats"},
+            {"brief", "help"},
+            {"signoff", "bye"},
+            {"intel", "find"},
+            {"close", "mark"},
+            {"reopen", "unmark"},
+            {"archive", "delete"}
+        };
+        for (String[] alias : aliases) {
+            if (lowerCaseCommand.equals(alias[0])) {
+                return alias[1];
+            }
+            if (lowerCaseCommand.startsWith(alias[0] + " ")) {
+                return alias[1] + command.substring(alias[0].length());
+            }
+        }
+        return command;
     }
 
     /**

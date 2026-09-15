@@ -889,22 +889,57 @@ ____________________________________________________________
 The squad desk is open.
 I'll keep the banter light and your case file organized.
 
-Available commands:
-todo <description>              Add a todo task.
-deadline <description> /by <date>
-                                 Add a deadline task using yyyy-MM-dd.
-event <description> /at <time>  Add an event task.
-list                              Show all tasks.
-stats                             Show task statistics.
-find <keyword>                   Find tasks by keyword.
-mark <task number>               Mark a task as done.
-unmark <task number>             Mark a task as not done.
-delete <task number>             Delete a task.
-help                              Show this command guide.
-bye                               Exit Duchess.
+Squad playbook:
+• todo <description> — Add a todo task.
+  case <description> — Squad alias for todo.
+• deadline <description> /by <date> — Add a deadline task.
+  timer <description> /by <date> — Squad alias for deadline.
+• event <description> /at <time> — Add an event task.
+  briefing <description> /at <time> — Squad alias for event.
+• list / rollcall — Show all tasks.
+• stats / report — Show task statistics.
+• find <keyword> / intel <keyword> — Find tasks by keyword.
+• mark <task number> / close <task number> — Mark a task done.
+• unmark <task number> / reopen <task number> — Reopen a task.
+• delete <task number> / archive <task number> — Delete a task.
+• help / brief — Show this playbook.
+• bye / signoff — Exit Duchess.
 
 Commands are not case-sensitive.
 
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 19: Accept squad-room aliases
+
+Aim: Verify that squad-room aliases execute the same behavior as the original
+task commands.
+
+Inputs:
+```text
+case read book
+rollcall
+signoff
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] read book
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

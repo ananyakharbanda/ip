@@ -49,6 +49,10 @@ public class DuchessTest {
                 () -> assertTrue(response.contains("deadline <description> /by <date>")),
                 () -> assertTrue(response.contains("event <description> /at <time>")),
                 () -> assertTrue(response.contains("find <keyword>")),
+                () -> assertTrue(response.contains("case <description>")),
+                () -> assertTrue(response.contains("rollcall")),
+                () -> assertTrue(response.contains("intel <keyword>")),
+                () -> assertTrue(response.contains("signoff")),
                 () -> assertTrue(response.contains("mark <task number>")),
                 () -> assertTrue(response.contains("unmark <task number>")),
                 () -> assertTrue(response.contains("delete <task number>")),
@@ -56,6 +60,39 @@ public class DuchessTest {
                 () -> assertTrue(response.contains("bye")),
                 () -> assertEquals("help", duchess.getCommandType())
         );
+    }
+
+    /** Verifies that squad aliases preserve the behavior of their canonical commands. */
+    @Test
+    public void getResponse_squadAliases_preserveCommandBehavior() {
+        Duchess duchess = createDuchess(new TaskList());
+
+        String addResponse = duchess.getResponse("case read book");
+        String deadlineResponse = duchess.getResponse("timer return book /by 2026-09-30");
+        String eventResponse = duchess.getResponse("briefing team meeting /at Friday 3pm");
+        String findResponse = duchess.getResponse("intel book");
+        String closeResponse = duchess.getResponse("close 1");
+        String reopenResponse = duchess.getResponse("reopen 1");
+        String archiveResponse = duchess.getResponse("archive 2");
+        String rollcallResponse = duchess.getResponse("rollcall");
+        String reportResponse = duchess.getResponse("report");
+        String briefResponse = duchess.getResponse("brief");
+
+        assertAll(
+                () -> assertTrue(addResponse.startsWith("added:")),
+                () -> assertTrue(deadlineResponse.startsWith("added:")),
+                () -> assertTrue(eventResponse.startsWith("added:")),
+                () -> assertTrue(findResponse.contains("read book")),
+                () -> assertTrue(closeResponse.contains("marked this task as done")),
+                () -> assertTrue(reopenResponse.contains("marked this task as not done")),
+                () -> assertTrue(archiveResponse.contains("removed this task")),
+                () -> assertTrue(rollcallResponse.contains("Here are the tasks")),
+                () -> assertTrue(reportResponse.contains("Task statistics:")),
+                () -> assertTrue(briefResponse.contains("Squad playbook:"))
+        );
+
+        duchess.getResponse("signoff");
+        assertTrue(duchess.isExitRequested());
     }
 
     /** Verifies that the help response communicates Duchess's squad-room personality. */

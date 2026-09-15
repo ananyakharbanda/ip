@@ -1,6 +1,7 @@
 package duchess.parser;
 
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 
 import duchess.DuchessException;
 import duchess.task.Deadline;
@@ -27,20 +28,21 @@ public final class Parser {
      */
     public static Task parseTask(String command) throws DuchessException {
         assert command != null : "The parser requires a command string";
-        String lowerCaseCommand = command.toLowerCase();
-        if (command.trim().isEmpty()) {
+        String normalizedCommand = normalizeTaskAlias(command);
+        String lowerCaseCommand = normalizedCommand.toLowerCase(Locale.ROOT);
+        if (normalizedCommand.trim().isEmpty()) {
             throw new DuchessException("OOPS!!! A command cannot be empty. "
                     + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
         }
         if (lowerCaseCommand.equals("todo") || lowerCaseCommand.startsWith("todo ")) {
-            String description = command.substring("todo".length()).trim();
+            String description = normalizedCommand.substring("todo".length()).trim();
             if (description.isEmpty()) {
                 throw new DuchessException("OOPS!!! The description of a todo cannot be empty.");
             }
             return new Todo(description);
         }
         if (lowerCaseCommand.equals("deadline") || lowerCaseCommand.startsWith("deadline ")) {
-            String[] details = splitTaskDetails(command.substring("deadline".length()), "/by");
+            String[] details = splitTaskDetails(normalizedCommand.substring("deadline".length()), "/by");
             validateTaskDetails("deadline", details, "/by");
             try {
                 return new Deadline(details[0], details[1]);
@@ -50,13 +52,28 @@ public final class Parser {
             }
         }
         if (lowerCaseCommand.equals("event") || lowerCaseCommand.startsWith("event ")) {
-            String[] details = splitTaskDetails(command.substring("event".length()), "/at");
+            String[] details = splitTaskDetails(normalizedCommand.substring("event".length()), "/at");
             validateTaskDetails("event", details, "/at");
             return new Event(details[0], details[1]);
         }
 
         throw new DuchessException("OOPS!!! I'm sorry, but I don't know what that means :-(\n"
                 + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
+    }
+
+    /** Converts squad-room task aliases into their original command names. */
+    private static String normalizeTaskAlias(String command) {
+        String lowerCaseCommand = command.toLowerCase(Locale.ROOT);
+        if (lowerCaseCommand.equals("case") || lowerCaseCommand.startsWith("case ")) {
+            return "todo" + command.substring("case".length());
+        }
+        if (lowerCaseCommand.equals("timer") || lowerCaseCommand.startsWith("timer ")) {
+            return "deadline" + command.substring("timer".length());
+        }
+        if (lowerCaseCommand.equals("briefing") || lowerCaseCommand.startsWith("briefing ")) {
+            return "event" + command.substring("briefing".length());
+        }
+        return command;
     }
 
     /**
