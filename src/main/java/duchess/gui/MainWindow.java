@@ -39,8 +39,8 @@ public class MainWindow extends VBox {
     public void setDuchess(Duchess duchess) {
         this.duchess = duchess;
         conversationView.addDialogs(
-                DialogBox.getDuchessDialog("👋 Good day! I'm Duchess, your royal steward.\n\n"
-                                + "Give me a command, or open Help for the court guide.", "welcome"));
+                DialogBox.getDuchessDialog("👋 Hey, squad! I'm Duchess, your precinct task partner.\n\n"
+                                + "Give me your next case, or open Help for the playbook.", "welcome"));
         composer.requestInputFocus();
     }
 
@@ -110,7 +110,7 @@ public class MainWindow extends VBox {
                 header.updateStatus("✦ Guide open", "status-ready");
             }
             default -> {
-                header.updateStatus("✦ Court ready", "status-ready");
+                header.updateStatus("✦ Squad ready", "status-ready");
             }
         }
     }

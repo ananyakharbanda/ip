@@ -865,10 +865,10 @@ Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-## Test case 18: Use Duchess's royal steward voice
+## Test case 18: Use Duchess's squad-room voice
 
-Aim: Verify that the help response introduces Duchess's consistent personality
-before displaying the command guide.
+Aim: Verify that the help response introduces Duchess's consistent squad-room
+personality before displaying the command guide.
 
 Inputs:
 ```text
@@ -886,8 +886,8 @@ Hello! I'm Duchess.
 What can I do for you?
 ____________________________________________________________
 ____________________________________________________________
-Duchess's royal desk is open.
-I keep your plans polished and your priorities in order.
+The squad desk is open.
+I'll keep the banter light and your case file organized.
 
 Available commands:
 todo <description>              Add a todo task.

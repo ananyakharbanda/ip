@@ -11,13 +11,13 @@
          xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Label text="👑" styleClass="brand-icon" />
+        <Label text="★" styleClass="brand-icon" />
         <VBox spacing="2.0">
             <Label text="Duchess" styleClass="brand-title" />
-            <Label text="Your poised royal task steward" styleClass="brand-subtitle" />
+            <Label text="Your precinct task partner" styleClass="brand-subtitle" />
         </VBox>
         <Region HBox.hgrow="ALWAYS" />
-        <Label fx:id="statusLabel" text="✦ Court ready" styleClass="status-pill status-ready" />
+        <Label fx:id="statusLabel" text="✦ Squad ready" styleClass="status-pill status-ready" />
         <Button fx:id="helpButton"
                 mnemonicParsing="false"
                 onAction="#handleHelp"

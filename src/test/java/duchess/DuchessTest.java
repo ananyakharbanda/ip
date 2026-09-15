@@ -58,15 +58,15 @@ public class DuchessTest {
         );
     }
 
-    /** Verifies that the help response communicates Duchess's royal steward personality. */
+    /** Verifies that the help response communicates Duchess's squad-room personality. */
     @Test
-    public void getResponse_helpCommand_usesRoyalStewardVoice() {
+    public void getResponse_helpCommand_usesSquadRoomVoice() {
         Duchess duchess = createDuchess(new TaskList());
 
         String response = duchess.getResponse("help");
 
-        assertTrue(response.contains("Duchess's royal desk is open."));
-        assertTrue(response.contains("I keep your plans polished and your priorities in order."));
+        assertTrue(response.contains("The squad desk is open."));
+        assertTrue(response.contains("I'll keep the banter light and your case file organized."));
     }
 
     /** Verifies that the GUI can process the command used to end a conversation. */
