@@ -39,7 +39,7 @@ public class Main extends Application {
             MainWindow controller = fxmlLoader.getController();
             controller.setDuchess(new Duchess());
 
-            stage.setTitle("Duchess ✦ Royal Task Companion");
+            stage.setTitle("Duchess ✦ Squad Task Desk");
             stage.setMinWidth(MIN_WINDOW_WIDTH);
             stage.setMinHeight(MIN_WINDOW_HEIGHT);
             stage.setResizable(true);

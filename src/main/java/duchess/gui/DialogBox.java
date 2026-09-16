@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.SVGPath;
 
 /** Represents one compact message in the Duchess conversation. */
 public class DialogBox extends HBox {
@@ -14,6 +16,14 @@ public class DialogBox extends HBox {
 
     @FXML
     private Label speakerLabel;
+
+    /** Displays the speaker's squad badge beside the message. */
+    @FXML
+    private StackPane avatarPane;
+
+    /** Draws a crisp profile symbol at any display resolution. */
+    @FXML
+    private SVGPath avatarIcon;
 
     /** Loads the reusable dialog layout and fills it with the message content. */
     private DialogBox(String text, String speaker) {
@@ -29,6 +39,7 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         speakerLabel.setText(speaker);
+        avatarPane.setAccessibleText(speaker + " squad badge");
     }
 
     /**
@@ -40,6 +51,10 @@ public class DialogBox extends HBox {
     public static DialogBox getUserDialog(String text) {
         DialogBox dialogBox = new DialogBox(text, "YOU");
         dialogBox.getStyleClass().add("user-row");
+        dialogBox.avatarIcon.setContent("M12 2 A5 5 0 1 0 12 12 A5 5 0 1 0 12 2 "
+                + "M2 23 C2 12 22 12 22 23 Z");
+        dialogBox.getChildren().remove(dialogBox.avatarPane);
+        dialogBox.getChildren().add(dialogBox.avatarPane);
         return dialogBox;
     }
 
