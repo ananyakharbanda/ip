@@ -60,6 +60,26 @@ public class DuchessTest {
         assertTrue(duchess.getResponse("list").contains("read book"));
     }
 
+    /** Verifies retrying after a write failure persists every change kept in memory. */
+    @Test
+    public void getResponse_saveFailureThenRecovery_savesEntireList() throws Exception {
+        Path parent = temporaryDirectory.resolve("blocked");
+        Files.writeString(parent, "block directory creation");
+        Storage storage = new Storage(parent.resolve("tasks.txt"));
+        Duchess duchess = new Duchess(storage, new TaskList());
+
+        assertTrue(duchess.getResponse("todo first").contains("couldn't save"));
+        assertTrue(duchess.getResponse("mark 1").contains("couldn't save"));
+        Files.delete(parent);
+        assertEquals("added: [T][ ] second", duchess.getResponse("todo second"));
+
+        TaskList restored = storage.loadTasks();
+        assertEquals(2, restored.size());
+        assertEquals("first", restored.get(0).getDescription());
+        assertTrue(restored.get(0).isDone());
+        assertEquals("second", restored.get(1).getDescription());
+    }
+
     /** Verifies that the GUI-facing response includes the current task list. */
     @Test
     public void getResponse_listCommand_returnsTaskListResponse() {
@@ -270,6 +290,32 @@ public class DuchessTest {
                         missingKeywordResponse),
                 () -> assertEquals("Here are the matching tasks in your list:", unmatchedKeywordResponse)
         );
+    }
+
+    /** Verifies that a number shown by search selects the same task in indexed commands. */
+    @Test
+    public void getResponse_findResultNumber_marksMatchingTask() {
+        TaskList tasks = new TaskList(new Todo("first"), new Todo("second"), new Todo("target"));
+        Duchess duchess = createDuchess(tasks);
+
+        assertEquals("Here are the matching tasks in your list:\n3.[T][ ] target",
+                duchess.getResponse("find target"));
+        duchess.getResponse("mark 3");
+        assertTrue(tasks.get(2).isDone());
+        assertFalse(tasks.get(0).isDone());
+    }
+
+    /** Verifies both interfaces receive a warning and failed saves preserve damaged data. */
+    @Test
+    public void getStartupWarning_damagedFile_protectsOriginalData() throws Exception {
+        Files.writeString(dataFile(), "damaged record\n");
+        Duchess duchess = new Duchess(new Storage(dataFile()), null);
+
+        assertTrue(duchess.getStartupWarning().contains("Saving is disabled"));
+        assertTrue(duchess.getResponse("todo temporary task").contains("couldn't save"));
+        assertTrue(duchess.getResponse("list").contains("temporary task"));
+        assertEquals("damaged record\n", Files.readString(dataFile()));
+        assertEquals("", createDuchess(new TaskList()).getStartupWarning());
     }
 
     /** Verifies that equivalent task details cannot be added twice. */

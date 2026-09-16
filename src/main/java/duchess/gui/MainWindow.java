@@ -42,6 +42,10 @@ public class MainWindow extends VBox {
         conversationView.addDialogs(
                 DialogBox.getDuchessDialog("👋 Hey, squad! I'm Duchess, your precinct task partner.\n\n"
                                 + "Give me your next case, or open Help for the playbook.", "welcome"));
+        if (!duchess.getStartupWarning().isEmpty()) {
+            conversationView.addDialogs(DialogBox.getDuchessDialog(duchess.getStartupWarning(), "error"));
+            updateStatus("error");
+        }
         composer.requestInputFocus();
     }
 

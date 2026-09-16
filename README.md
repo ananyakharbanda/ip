@@ -71,11 +71,32 @@ scripts\run-cli.bat
 | `help` | `help` | Display the command guide |
 | `bye` | `bye` | Exit Duchess |
 
-Task numbers start from 1. Commands are case-insensitive.
+Task numbers start from 1. Search results retain the numbers from `list`,
+so you can use a result's number with `mark`, `unmark`, or `delete`.
+Commands are case-insensitive.
 Leading, trailing, and repeated whitespace is accepted. Duchess rejects
 missing or repeated parameters, invalid dates and date ranges, invalid task
 numbers, unexpected arguments, and duplicate tasks with a specific error
 message while keeping the session usable.
+
+## Data files and error recovery
+
+Duchess uses `data/duchess.txt` relative to the directory where you start
+the application. Start it from the same directory each time to load the
+same task list. If the file is missing, Duchess starts with an empty list
+and creates the directory and file when you next change a task.
+
+Malformed records are skipped while valid records remain available. An
+unreadable file results in an empty list. Both interfaces show a startup warning
+and disable saving after either problem to protect the original file. Back up
+and repair the file or its permissions, then restart Duchess. You can still
+work with tasks in memory, but those changes are lost when you exit.
+
+If saving fails, Duchess shows `OOPS!!! I couldn't save your task list to
+disk.` and keeps the change in memory. Check that the data directory is
+writable and that `data/duchess.txt` is a file, then make another task change
+to retry saving the full list. If a startup warning disabled saving, repair
+the original data and restart first. Unsaved changes are lost when you exit.
 
 ## Build and test
 
@@ -157,3 +178,16 @@ and the [Duchess User Guide](docs/README.md).
 
 The Gradle wrapper downloads and uses the project’s configured Gradle version,
 so a global Gradle installation is not required.
+
+## Acknowledgements
+
+- This project builds on the SE-EDU individual project starter template and
+  course JavaFX guidance.
+- The project uses OpenJFX for the graphical interface, JUnit Jupiter for
+  automated tests, and Gradle with Shadow, Checkstyle, and JaCoCo for building
+  and quality checks. Their configured versions are recorded in
+  `build.gradle` and `gradle/quality.gradle`.
+- OpenAI Codex was used by the project author to assist with this feature
+  finalization review, inspect existing error handling and product naming,
+  document storage recovery, correct search numbering, protect damaged saved
+  data, update regression tests, and run verification checks.

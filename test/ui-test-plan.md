@@ -627,7 +627,7 @@ ____________________________________________________________
 ## Test case 13: Load saved tasks and skip corrupted records
 
 Aim: Verify that Duchess loads todo, deadline, and event records at startup,
-restores completion state, and ignores an invalid record without crashing.
+restores completion state, warns about invalid records, and blocks destructive saves.
 
 Initial data file:
 ```text
@@ -640,6 +640,7 @@ not-a-valid-record
 Inputs:
 ```text
 list
+todo temporary task
 bye
 ```
 
@@ -652,11 +653,19 @@ ____________________________________________________________
 Hello! I'm Duchess.
 What can I do for you?
 ____________________________________________________________
+OOPS!!! I couldn't fully load your saved tasks from data/duchess.txt.
+Saving is disabled to protect that file. Back it up, repair the file or its permissions, then restart Duchess.
+Changes made in this session stay in memory and will be lost on exit.
+____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] read book
 2.[D][ ] return book (by: Dec 02 2019)
 3.[E][ ] buy bread (at: Saturday)
+____________________________________________________________
+____________________________________________________________
+OOPS!!! I couldn't save your task list to disk.
+added: [T][ ] temporary task
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
@@ -747,7 +756,7 @@ Here are the matching tasks in your list:
 ____________________________________________________________
 ____________________________________________________________
 Here are the matching tasks in your list:
-1.[E][ ] project meeting (at: Monday)
+3.[E][ ] project meeting (at: Monday)
 ____________________________________________________________
 ____________________________________________________________
 Here are the matching tasks in your list:
@@ -1025,6 +1034,53 @@ Here are the tasks in your list:
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! Please use 'bye' without arguments.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 22: Use search result numbers to update tasks
+
+Aim: Verify that search retains full-list numbers so mark updates the matching task.
+
+Inputs:
+```text
+todo first task
+todo target task
+find target
+mark 2
+list
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] first task
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] target task
+____________________________________________________________
+____________________________________________________________
+Here are the matching tasks in your list:
+2.[T][ ] target task
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [T][X] target task
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] first task
+2.[T][X] target task
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

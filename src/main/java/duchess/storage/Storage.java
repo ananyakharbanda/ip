@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
@@ -30,6 +31,9 @@ public class Storage {
     /** The file used to persist this storage service's task list. */
     private final Path dataFile;
 
+    /** Prevents replacing saved data that could not be fully restored. */
+    private boolean hasLoadFailure;
+
     /** Creates a storage service that uses Duchess's default data file. */
     public Storage() {
         this(DEFAULT_DATA_FILE);
@@ -53,29 +57,44 @@ public class Storage {
      *
      * <p>A missing file means Duchess has no saved tasks yet. Invalid lines
      * are ignored individually, allowing valid records in a partially
-     * corrupted file to remain usable.</p>
+     * corrupted file to remain usable. Saving is disabled after an incomplete
+     * load to avoid overwriting records that were not restored.</p>
      *
      * @return the restored tasks, or an empty task list when the file is absent
      *         or cannot be read
      */
     public TaskList loadTasks() {
+        hasLoadFailure = false;
         try {
-            if (!Files.isRegularFile(dataFile)) {
-                return new TaskList();
-            }
-
             TaskList tasks = new TaskList();
             for (String line : Files.readAllLines(dataFile, StandardCharsets.UTF_8)) {
                 Task task = deserialize(line);
+                if (task == null && !line.isBlank()) {
+                    hasLoadFailure = true;
+                }
                 if (task != null && !tasks.containsEquivalent(task)) {
                     tasks.add(task);
                 }
             }
             return tasks;
+        } catch (NoSuchFileException exception) {
+            return new TaskList();
         } catch (IOException | SecurityException exception) {
             // A damaged or inaccessible file should not prevent Duchess from starting.
+            hasLoadFailure = true;
             return new TaskList();
         }
+    }
+
+    /**
+     * Returns a recovery warning when saved data could not be fully loaded.
+     *
+     * @return the warning, or an empty string after a successful load or first run.
+     */
+    public String getLoadWarning() {
+        return hasLoadFailure ? "OOPS!!! I couldn't fully load your saved tasks from " + dataFile + ".\n"
+                + "Saving is disabled to protect that file. Back it up, repair the file or its permissions, "
+                + "then restart Duchess.\nChanges made in this session stay in memory and will be lost on exit." : "";
     }
 
     /**
@@ -86,10 +105,13 @@ public class Storage {
      * list.</p>
      *
      * @param tasks the task list to save
-     * @throws IOException if the directory or file cannot be written
+     * @throws IOException if saved data was not fully loaded or the path cannot be written.
      */
     public void saveTasks(TaskList tasks) throws IOException {
         assert tasks != null : "Storage requires a task list to save";
+        if (hasLoadFailure) {
+            throw new IOException("Saving disabled because saved tasks could not be fully loaded");
+        }
         try {
             Path parent = dataFile.getParent();
             if (parent == null) {
