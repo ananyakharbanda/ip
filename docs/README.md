@@ -44,8 +44,8 @@ event <description> /from <yyyy-MM-dd> /to <yyyy-MM-dd>
 ```
 
 For example, `event orientation /from 2026-09-15 /to 2026-09-17` creates
-an event with an inclusive date range. Same-day events are allowed. The end
-date must not precede the start date. Dates display as `Sep 15 2026`.
+an event with a date range. The end date must be later than the start date.
+Dates display as `Sep 15 2026`.
 
 Existing events and the legacy `event <description> /at <time>` form remain
 supported, preserving their original free-text times.
@@ -95,6 +95,19 @@ the previous seven days. Legacy completed records without a timestamp remain
 readable and count toward the overall completed total.
 
 Use `help` to display the supported commands and `bye` to exit Duchess.
+
+## Input and recovery behavior
+
+Duchess ignores harmless leading, trailing, and repeated whitespace in
+commands. Required parameters must appear exactly once, dates must be real ISO
+dates, and task numbers must be positive whole numbers that refer to an
+existing task. A task with the same type and details as an existing task is
+rejected as a duplicate.
+
+A missing data file is treated as an empty task list. Malformed and duplicate
+records are skipped while other valid records are loaded. If a change cannot
+be saved because the data location is unavailable or access is denied, Duchess
+keeps running, retains the in-memory change, and displays a save warning.
 
 ## JavaFX interface
 

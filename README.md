@@ -72,6 +72,10 @@ scripts\run-cli.bat
 | `bye` | `bye` | Exit Duchess |
 
 Task numbers start from 1. Commands are case-insensitive.
+Leading, trailing, and repeated whitespace is accepted. Duchess rejects
+missing or repeated parameters, invalid dates and date ranges, invalid task
+numbers, unexpected arguments, and duplicate tasks with a specific error
+message while keeping the session usable.
 
 ## Build and test
 

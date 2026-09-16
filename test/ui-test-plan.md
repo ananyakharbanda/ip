@@ -317,10 +317,10 @@ ____________________________________________________________
 OOPS!!! An event must include a non-empty /at value. Example: event task description /at time.
 ____________________________________________________________
 ____________________________________________________________
-OOPS!!! Please provide a valid task number between 1 and 0.
+OOPS!!! Your task list is empty, so there is no task to update.
 ____________________________________________________________
 ____________________________________________________________
-OOPS!!! Please provide a valid task number between 1 and 0.
+OOPS!!! Your task list is empty, so there is no task to update.
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! Please use 'mark <task number>', for example: mark 1.
@@ -565,7 +565,7 @@ ____________________________________________________________
 OOPS!!! The description of a deadline cannot be empty.
 ____________________________________________________________
 ____________________________________________________________
-OOPS!!! The description of a event cannot be empty.
+OOPS!!! The description of an event cannot be empty.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
@@ -582,19 +582,16 @@ Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-## Test case 12: Keep duplicate descriptions independent
+## Test case 12: Reject duplicate tasks
 
-Aim: Verify that duplicate task descriptions are stored as separate objects
-and that deleting a completed duplicate does not change the remaining one.
+Aim: Verify that an equivalent task is rejected without changing the existing
+task or preventing later commands.
 
 Inputs:
 ```text
 todo read book
-todo read book
+todo   READ BOOK
 mark 1
-delete 1
-list
-unmark 1
 list
 bye
 ```
@@ -612,28 +609,15 @@ ____________________________________________________________
 added: [T][ ] read book
 ____________________________________________________________
 ____________________________________________________________
-added: [T][ ] read book
+OOPS!!! That task already exists in your list.
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
   [T][X] read book
 ____________________________________________________________
 ____________________________________________________________
-Noted. I've removed this task:
-  [T][X] read book
-Now you have 1 tasks in the list.
-____________________________________________________________
-____________________________________________________________
 Here are the tasks in your list:
-1.[T][ ] read book
-____________________________________________________________
-____________________________________________________________
-Okay, I've marked this task as not done yet:
-  [T][ ] read book
-____________________________________________________________
-____________________________________________________________
-Here are the tasks in your list:
-1.[T][ ] read book
+1.[T][X] read book
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
@@ -979,10 +963,10 @@ ____________________________________________________________
 OOPS!!! The event dates are invalid. Use yyyy-MM-dd.
 ____________________________________________________________
 ____________________________________________________________
-OOPS!!! The event end date cannot be before its start date.
+OOPS!!! The event end date must be later than its start date.
 ____________________________________________________________
 ____________________________________________________________
-OOPS!!! Use event <description> /from <yyyy-MM-dd> /to <yyyy-MM-dd>.
+OOPS!!! An event must contain exactly one /from and one /to parameter.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
@@ -995,6 +979,52 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[E][X] orientation (from: Sep 15 2026 to: Sep 17 2026)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 21: Normalize whitespace and reject repeated parameters
+
+Aim: Verify that harmless leading and repeated whitespace is accepted while
+duplicate parameters and same-day event ranges are rejected without changing
+the task list.
+
+Inputs:
+```text
+   todo     read book
+deadline report /by 2026-09-20 /by 2026-09-21
+event meeting /from 2026-09-20 /to 2026-09-20
+   list
+bye now
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [T][ ] read book
+____________________________________________________________
+____________________________________________________________
+OOPS!!! A deadline must contain exactly one /by parameter.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! The event end date must be later than its start date.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Please use 'bye' without arguments.
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

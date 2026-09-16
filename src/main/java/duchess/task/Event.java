@@ -29,20 +29,20 @@ public class Event extends Task {
     }
 
     /**
-     * Creates an event with an inclusive date range; same-day events are allowed.
+     * Creates an event whose end date is later than its start date.
      *
      * @param description the event description.
      * @param from the start date in yyyy-MM-dd format.
      * @param to the end date in yyyy-MM-dd format.
-     * @throws IllegalArgumentException if the end precedes the start.
+     * @throws IllegalArgumentException if the end is not later than the start.
      * @throws java.time.format.DateTimeParseException if either date is invalid.
      */
     public Event(String description, String from, String to) {
         super(description, TaskType.EVENT);
         this.from = LocalDate.parse(from);
         this.to = LocalDate.parse(to);
-        if (this.to.isBefore(this.from)) {
-            throw new IllegalArgumentException("Event end precedes start");
+        if (!this.to.isAfter(this.from)) {
+            throw new IllegalArgumentException("Event end must be later than start");
         }
         at = null;
     }
