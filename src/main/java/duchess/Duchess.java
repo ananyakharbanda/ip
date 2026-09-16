@@ -1,7 +1,6 @@
 package duchess;
 
 import java.time.Clock;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -95,6 +94,10 @@ public class Duchess {
         Duchess duchess = new Duchess();
         Ui ui = new Ui();
         ui.showWelcome();
+        if (!duchess.getStartupWarning().isEmpty()) {
+            ui.showMessage(duchess.getStartupWarning());
+            ui.showSeparator();
+        }
 
         while (ui.hasNextLine()) {
             String command = ui.readCommand();
@@ -211,6 +214,15 @@ public class Duchess {
     }
 
     /**
+     * Returns any warning about restoring saved tasks for both user interfaces.
+     *
+     * @return the storage warning, or an empty string when startup needs no warning.
+     */
+    public String getStartupWarning() {
+        return storage.getLoadWarning();
+    }
+
+    /**
      * Returns whether the user has requested to leave the conversation.
      *
      * @return {@code true} after the {@code bye} command has been processed
@@ -228,7 +240,14 @@ public class Duchess {
                     + "for example: find book.");
         }
 
-        return formatTasks(tasks.find(keyword), "Here are the matching tasks in your list:");
+        String lowerCaseKeyword = keyword.toLowerCase(Locale.ROOT);
+        String matches = IntStream.range(0, tasks.size())
+                .filter(index -> tasks.get(index).getDescription().toLowerCase(Locale.ROOT)
+                        .contains(lowerCaseKeyword))
+                .mapToObj(index -> (index + 1) + "." + tasks.get(index))
+                .collect(Collectors.joining("\n"));
+        String heading = "Here are the matching tasks in your list:";
+        return matches.isEmpty() ? heading : heading + "\n" + matches;
     }
 
     /** Returns the response to a mark command. */
@@ -278,13 +297,6 @@ public class Duchess {
     private String formatTasks(TaskList taskList, String heading) {
         return taskList.size() == 0 ? heading : IntStream.range(0, taskList.size())
                 .mapToObj(index -> (index + 1) + "." + taskList.get(index))
-                .collect(Collectors.joining("\n", heading + "\n", ""));
-    }
-
-    /** Formats a list of tasks using one-based indexes. */
-    private String formatTasks(ArrayList<Task> taskArray, String heading) {
-        return taskArray.isEmpty() ? heading : IntStream.range(0, taskArray.size())
-                .mapToObj(index -> (index + 1) + "." + taskArray.get(index))
                 .collect(Collectors.joining("\n", heading + "\n", ""));
     }
 

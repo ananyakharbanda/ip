@@ -1,12 +1,14 @@
 package duchess.storage;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -116,9 +118,31 @@ public class StorageTest {
     /** Verifies that a missing data file produces an empty task list. */
     @Test
     public void storage_missingFile_returnsEmptyTaskList() {
-        TaskList restored = new Storage(temporaryDirectory.resolve("missing.txt")).loadTasks();
+        Storage storage = new Storage(temporaryDirectory.resolve("missing.txt"));
+        TaskList restored = storage.loadTasks();
 
         assertEquals(0, restored.size());
+        assertEquals("", storage.getLoadWarning());
+    }
+
+    /** Verifies an unreadable file cannot be overwritten until a successful reload. */
+    @Test
+    public void storage_failedLoad_blocksSaveUntilRecovery() throws Exception {
+        Path dataFile = temporaryDirectory.resolve("damaged.txt");
+        byte[] damagedBytes = {(byte) 0xC3, (byte) 0x28};
+        Files.write(dataFile, damagedBytes);
+        Storage storage = new Storage(dataFile);
+        storage.loadTasks();
+
+        assertTrue(storage.getLoadWarning().contains(dataFile.toString()));
+        assertThrows(IOException.class, () -> storage.saveTasks(new TaskList(new Todo("new"))));
+        assertArrayEquals(damagedBytes, Files.readAllBytes(dataFile));
+
+        Files.writeString(dataFile, "\n");
+        assertEquals(0, storage.loadTasks().size());
+        assertEquals("", storage.getLoadWarning());
+        storage.saveTasks(new TaskList(new Todo("recovered")));
+        assertEquals("recovered", storage.loadTasks().get(0).getDescription());
     }
 
     /** Verifies that a directory at the data-file location is treated as unreadable storage. */

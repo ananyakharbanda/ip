@@ -17,7 +17,9 @@ Use Java 25 and run one of the following Gradle tasks from the project root:
 
 Tasks are saved in `data/duchess.txt` and loaded again the next time Duchess
 starts. Records that cannot be parsed are skipped so that one malformed record
-does not prevent the remaining tasks from loading.
+does not prevent the remaining tasks from loading. If records are damaged or
+the file is unreadable, Duchess warns at startup and disables saving to protect
+the file. Back it up, repair it or its permissions, and restart Duchess.
 
 ## Commands
 
@@ -65,6 +67,9 @@ without changing the underlying task list:
 find report
 ```
 
+Search results keep the task numbers shown by `list`. Use those numbers to
+mark, unmark, or delete the matching task.
+
 ### Update tasks
 
 Tasks are numbered starting from 1. Mark, unmark, or delete a task with:
@@ -108,6 +113,8 @@ A missing data file is treated as an empty task list. Malformed and duplicate
 records are skipped while other valid records are loaded. If a change cannot
 be saved because the data location is unavailable or access is denied, Duchess
 keeps running, retains the in-memory change, and displays a save warning.
+Changes made while saving is disabled are lost on exit. A successful save
+after a temporary write failure saves the entire current list.
 
 ## JavaFX interface
 

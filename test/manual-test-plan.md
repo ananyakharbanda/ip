@@ -63,7 +63,23 @@ Steps:
 
 Expected: No additional command can be submitted after exit is requested.
 
-## Test case 5: Platform and language smoke test
+## Test case 5: Startup recovery warning
+
+Aim: Verify that the GUI clearly reports a damaged data file and protects it.
+
+Steps:
+
+1. Use an isolated working directory and create `data/duchess.txt` containing
+   `not-a-valid-record`.
+2. Launch the executable JAR from that directory.
+3. Confirm an error dialog explains that saving is disabled and gives recovery steps.
+4. Enter `todo temporary task`, then `list`.
+5. Exit and verify the original file still contains `not-a-valid-record`.
+
+Expected: The warning appears after the greeting. The task remains usable in
+memory, the save failure is shown, and the damaged file remains unchanged.
+
+## Test case 6: Platform and language smoke test
 
 Aim: Detect platform-specific launch, font, locale, or path problems.
 
