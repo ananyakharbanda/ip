@@ -10,7 +10,6 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Objects;
 
 import duchess.task.Deadline;
 import duchess.task.Event;
@@ -60,17 +59,20 @@ public class Storage {
      *         or cannot be read
      */
     public TaskList loadTasks() {
-        if (!Files.isRegularFile(dataFile)) {
-            return new TaskList();
-        }
-
         try {
-            Task[] tasks = Files.readAllLines(dataFile, StandardCharsets.UTF_8).stream()
-                    .map(this::deserialize)
-                    .filter(Objects::nonNull)
-                    .toArray(Task[]::new);
-            return new TaskList(tasks);
-        } catch (IOException exception) {
+            if (!Files.isRegularFile(dataFile)) {
+                return new TaskList();
+            }
+
+            TaskList tasks = new TaskList();
+            for (String line : Files.readAllLines(dataFile, StandardCharsets.UTF_8)) {
+                Task task = deserialize(line);
+                if (task != null && !tasks.containsEquivalent(task)) {
+                    tasks.add(task);
+                }
+            }
+            return tasks;
+        } catch (IOException | SecurityException exception) {
             // A damaged or inaccessible file should not prevent Duchess from starting.
             return new TaskList();
         }
@@ -88,27 +90,31 @@ public class Storage {
      */
     public void saveTasks(TaskList tasks) throws IOException {
         assert tasks != null : "Storage requires a task list to save";
-        Path parent = dataFile.getParent();
-        if (parent == null) {
-            parent = Path.of(".");
-        }
-        Files.createDirectories(parent);
-        Path temporaryFile = Files.createTempFile(parent, "duchess", ".tmp");
-
         try {
-            ArrayList<String> lines = new ArrayList<>();
-            for (int i = 0; i < tasks.size(); i++) {
-                lines.add(serialize(tasks.get(i)));
+            Path parent = dataFile.getParent();
+            if (parent == null) {
+                parent = Path.of(".");
             }
-            Files.write(temporaryFile, lines, StandardCharsets.UTF_8);
+            Files.createDirectories(parent);
+            Path temporaryFile = Files.createTempFile(parent, "duchess", ".tmp");
+
             try {
-                Files.move(temporaryFile, dataFile, StandardCopyOption.REPLACE_EXISTING,
-                        StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException exception) {
-                Files.move(temporaryFile, dataFile, StandardCopyOption.REPLACE_EXISTING);
+                ArrayList<String> lines = new ArrayList<>();
+                for (int i = 0; i < tasks.size(); i++) {
+                    lines.add(serialize(tasks.get(i)));
+                }
+                Files.write(temporaryFile, lines, StandardCharsets.UTF_8);
+                try {
+                    Files.move(temporaryFile, dataFile, StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.ATOMIC_MOVE);
+                } catch (AtomicMoveNotSupportedException exception) {
+                    Files.move(temporaryFile, dataFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } finally {
+                Files.deleteIfExists(temporaryFile);
             }
-        } finally {
-            Files.deleteIfExists(temporaryFile);
+        } catch (SecurityException exception) {
+            throw new IOException("Permission denied while saving tasks", exception);
         }
     }
 

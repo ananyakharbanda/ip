@@ -30,6 +30,14 @@ public class ParserTest {
         );
     }
 
+    /** Verifies that harmless outer and separator whitespace is accepted. */
+    @Test
+    public void parseTask_extraWhitespace_returnsTask() throws DuchessException {
+        Todo task = assertInstanceOf(Todo.class, Parser.parseTask("  todo     read book  "));
+
+        assertEquals("read book", task.getDescription());
+    }
+
     /** Verifies that a deadline command creates a task with its parsed date. */
     @Test
     public void parseTask_deadlineCommand_returnsDeadlineTask() throws DuchessException {
@@ -108,6 +116,13 @@ public class ParserTest {
                         + "Use yyyy-MM-dd, for example: 2019-12-02.");
     }
 
+    /** Verifies that a deadline cannot contain its parameter more than once. */
+    @Test
+    public void parseTask_deadlineWithDuplicateByParameters_throwsDuchessException() {
+        assertParseTaskFailsWithMessage("deadline report /by 2026-09-20 /by 2026-09-21",
+                "OOPS!!! A deadline must contain exactly one /by parameter.");
+    }
+
     /** Verifies that an event without a time is rejected. */
     @Test
     public void parseTask_eventWithoutAtValue_throwsDuchessException() {
@@ -120,7 +135,14 @@ public class ParserTest {
     @Test
     public void parseTask_eventWithoutDescription_throwsDuchessException() {
         assertParseTaskFailsWithMessage("event /at Monday",
-                "OOPS!!! The description of a event cannot be empty.");
+                "OOPS!!! The description of an event cannot be empty.");
+    }
+
+    /** Verifies that embedded control characters cannot become task data. */
+    @Test
+    public void parseTask_controlCharacter_throwsDuchessException() {
+        assertParseTaskFailsWithMessage("todo read\nlist",
+                "OOPS!!! Commands cannot contain control characters.");
     }
 
     /** Verifies that unsupported commands are rejected. */
@@ -194,6 +216,12 @@ public class ParserTest {
         assertEquals(-1, Parser.parseTaskIndex("mark 2147483648", "mark "));
     }
 
+    /** Verifies that the minimum integer cannot overflow into a valid task index. */
+    @Test
+    public void parseTaskIndex_minimumInteger_returnsMinusOne() {
+        assertEquals(-1, Parser.parseTaskIndex("mark -2147483648", "mark "));
+    }
+
     /** Verifies date ranges and their case-insensitive squad alias. */
     @Test
     public void parseTask_eventRange_parsesDates() throws DuchessException {
@@ -215,6 +243,8 @@ public class ParserTest {
             "event meeting /from 2026-09-15 /to",
             "event meeting /from 2026-02-30 /to 2026-03-01",
             "event meeting /from 2026-09-17 /to 2026-09-15",
+            "event meeting /from 2026-09-15 /to 2026-09-15",
+            "event meeting /from 2026-09-15 /from 2026-09-16 /to 2026-09-17",
             "event meeting /from 2026-09-15 /to 2026-09-17 /to 2026-09-18"
         };
         for (String command : invalidCommands) {

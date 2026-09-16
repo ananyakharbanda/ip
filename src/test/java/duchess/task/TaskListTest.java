@@ -39,6 +39,25 @@ public class TaskListTest {
         );
     }
 
+    /** Verifies duplicate checks compare type-specific details and normalize user text. */
+    @Test
+    public void taskList_containsEquivalent_comparesAllTaskDetails() {
+        TaskList tasks = new TaskList(
+                new Todo("Read   Book"),
+                new Deadline("submit report", "2026-09-30"),
+                new Event("meeting", "Monday 3pm"));
+
+        assertAll(
+                () -> assertTrue(tasks.containsEquivalent(new Todo("read book"))),
+                () -> assertTrue(tasks.containsEquivalent(
+                        new Deadline("SUBMIT REPORT", "2026-09-30"))),
+                () -> assertTrue(tasks.containsEquivalent(new Event("meeting", "monday 3PM"))),
+                () -> assertFalse(tasks.containsEquivalent(
+                        new Deadline("submit report", "2026-10-01"))),
+                () -> assertFalse(tasks.containsEquivalent(new Event("meeting", "Tuesday 3pm")))
+        );
+    }
+
     /** Verifies that the varargs constructor protects the task list from array changes. */
     @Test
     public void taskList_constructorCopiesInitialTasks_keepsIndependentState() {

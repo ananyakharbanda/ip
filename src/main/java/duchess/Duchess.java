@@ -115,56 +115,47 @@ public class Duchess {
      * @return the response that should be displayed to the user
      */
     public String getResponse(String command) {
-        String safeCommand = normalizeAlias(command == null ? "" : command);
+        String safeCommand = normalizeAlias(command == null ? "" : command.strip());
         String lowerCaseCommand = safeCommand.toLowerCase(Locale.ROOT);
 
-        if (safeCommand.equalsIgnoreCase("bye")) {
-            commandType = COMMAND_TYPE_BYE;
-            exitRequested = true;
-            return "Bye. Hope to see you again soon!";
-        }
-
         try {
-            if (safeCommand.equalsIgnoreCase("help")) {
+            if (hasCommandWord(lowerCaseCommand, "bye")) {
+                requireNoArguments(safeCommand, "bye");
+                commandType = COMMAND_TYPE_BYE;
+                exitRequested = true;
+                return "Bye. Hope to see you again soon!";
+            } else if (hasCommandWord(lowerCaseCommand, "help")) {
+                requireNoArguments(safeCommand, "help");
                 commandType = COMMAND_TYPE_HELP;
                 return HELP_RESPONSE;
-            } else if (safeCommand.equalsIgnoreCase("list")) {
+            } else if (hasCommandWord(lowerCaseCommand, "list")) {
+                requireNoArguments(safeCommand, "list");
                 commandType = COMMAND_TYPE_LIST;
                 return formatTasks(tasks, "Here are the tasks in your list:");
-            } else if (safeCommand.equalsIgnoreCase("stats")) {
+            } else if (hasCommandWord(lowerCaseCommand, "stats")) {
+                requireNoArguments(safeCommand, "stats");
                 commandType = COMMAND_TYPE_STATS;
                 return formatStatistics();
-            } else if (lowerCaseCommand.startsWith("stats ")) {
-                throw new DuchessException("OOPS!!! Please use 'stats' without arguments.");
-            } else if (lowerCaseCommand.startsWith("find ")) {
+            } else if (hasCommandWord(lowerCaseCommand, "find")) {
                 commandType = COMMAND_TYPE_FIND;
                 return findTasks(safeCommand);
-            } else if (lowerCaseCommand.startsWith("mark ")) {
+            } else if (hasCommandWord(lowerCaseCommand, "mark")) {
                 commandType = COMMAND_TYPE_MARK;
                 return markTask(safeCommand);
-            } else if (lowerCaseCommand.startsWith("unmark ")) {
+            } else if (hasCommandWord(lowerCaseCommand, "unmark")) {
                 commandType = COMMAND_TYPE_UNMARK;
                 return unmarkTask(safeCommand);
-            } else if (lowerCaseCommand.startsWith("delete ")) {
+            } else if (hasCommandWord(lowerCaseCommand, "delete")) {
                 commandType = COMMAND_TYPE_DELETE;
                 return deleteTask(safeCommand);
-            } else if (safeCommand.equalsIgnoreCase("mark")) {
-                throw new DuchessException("OOPS!!! Please use 'mark <task number>', "
-                        + "for example: mark 1.");
-            } else if (safeCommand.equalsIgnoreCase("unmark")) {
-                throw new DuchessException("OOPS!!! Please use 'unmark <task number>', "
-                        + "for example: unmark 1.");
-            } else if (safeCommand.equalsIgnoreCase("delete")) {
-                throw new DuchessException("OOPS!!! Please use 'delete <task number>', "
-                        + "for example: delete 1.");
-            } else if (safeCommand.equalsIgnoreCase("find")) {
-                throw new DuchessException("OOPS!!! Please use 'find <keyword>', "
-                        + "for example: find book.");
             }
 
             commandType = COMMAND_TYPE_ADD;
             Task task = Parser.parseTask(safeCommand);
             assert task != null : "The parser must return a task for a valid add command";
+            if (tasks.containsEquivalent(task)) {
+                throw new DuchessException("OOPS!!! That task already exists in your list.");
+            }
             tasks.add(task);
             return withSaveWarning("added: " + task);
         } catch (DuchessException exception) {
@@ -175,7 +166,11 @@ public class Duchess {
 
     /** Converts squad-room command aliases into the canonical command names. */
     private String normalizeAlias(String command) {
-        String lowerCaseCommand = command.toLowerCase(Locale.ROOT);
+        if (command.isEmpty()) {
+            return command;
+        }
+
+        String[] commandParts = command.split("\\s+", 2);
         String[][] aliases = {
             {"rollcall", "list"},
             {"report", "stats"},
@@ -187,14 +182,23 @@ public class Duchess {
             {"archive", "delete"}
         };
         for (String[] alias : aliases) {
-            if (lowerCaseCommand.equals(alias[0])) {
-                return alias[1];
-            }
-            if (lowerCaseCommand.startsWith(alias[0] + " ")) {
-                return alias[1] + command.substring(alias[0].length());
+            if (commandParts[0].equalsIgnoreCase(alias[0])) {
+                return commandParts.length == 1 ? alias[1] : alias[1] + " " + commandParts[1];
             }
         }
         return command;
+    }
+
+    /** Returns whether input begins with the supplied complete command word. */
+    private boolean hasCommandWord(String command, String commandWord) {
+        return command.split("\\s+", 2)[0].equals(commandWord);
+    }
+
+    /** Rejects arguments supplied to a command that does not accept them. */
+    private void requireNoArguments(String command, String commandWord) throws DuchessException {
+        if (!command.equalsIgnoreCase(commandWord)) {
+            throw new DuchessException("OOPS!!! Please use '" + commandWord + "' without arguments.");
+        }
     }
 
     /**
@@ -217,7 +221,8 @@ public class Duchess {
 
     /** Returns the response to a find command. */
     private String findTasks(String command) throws DuchessException {
-        String keyword = command.substring("find ".length()).trim();
+        String[] commandParts = command.split("\\s+", 2);
+        String keyword = commandParts.length == 2 ? commandParts[1].strip() : "";
         if (keyword.isEmpty()) {
             throw new DuchessException("OOPS!!! Please use 'find <keyword>', "
                     + "for example: find book.");
@@ -228,6 +233,7 @@ public class Duchess {
 
     /** Returns the response to a mark command. */
     private String markTask(String command) throws DuchessException {
+        requireTaskNumber(command, "mark");
         int taskIndex = Parser.parseTaskIndex(command, "mark ");
         validateTaskIndex(taskIndex);
 
@@ -237,6 +243,7 @@ public class Duchess {
 
     /** Returns the response to an unmark command. */
     private String unmarkTask(String command) throws DuchessException {
+        requireTaskNumber(command, "unmark");
         int taskIndex = Parser.parseTaskIndex(command, "unmark ");
         validateTaskIndex(taskIndex);
 
@@ -247,6 +254,7 @@ public class Duchess {
 
     /** Returns the response to a delete command. */
     private String deleteTask(String command) throws DuchessException {
+        requireTaskNumber(command, "delete");
         int taskIndex = Parser.parseTaskIndex(command, "delete ");
         validateTaskIndex(taskIndex);
 
@@ -291,9 +299,20 @@ public class Duchess {
                 + "Completion rate: " + statistics.getCompletionRatePercentage() + "%";
     }
 
+    /** Rejects a task command whose required number is missing. */
+    private void requireTaskNumber(String command, String commandWord) throws DuchessException {
+        if (command.equalsIgnoreCase(commandWord)) {
+            throw new DuchessException("OOPS!!! Please use '" + commandWord
+                    + " <task number>', for example: " + commandWord + " 1.");
+        }
+    }
+
     /** Validates a zero-based task index. */
     private void validateTaskIndex(int taskIndex) throws DuchessException {
         if (taskIndex < 0 || taskIndex >= tasks.size()) {
+            if (tasks.size() == 0) {
+                throw new DuchessException("OOPS!!! Your task list is empty, so there is no task to update.");
+            }
             throw new DuchessException("OOPS!!! Please provide a valid task number between 1 and "
                     + tasks.size() + ".");
         }

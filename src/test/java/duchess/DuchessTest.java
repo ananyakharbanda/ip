@@ -50,6 +50,20 @@ public class DuchessTest {
         );
     }
 
+    /** Verifies that leading, trailing, and repeated command whitespace is harmless. */
+    @Test
+    public void getResponse_whitespacePaddedCommands_processesNormally() {
+        Duchess duchess = createDuchess(new TaskList());
+
+        String addResponse = duchess.getResponse("   todo    read book   ");
+        String markResponse = duchess.getResponse("  mark     1  ");
+
+        assertAll(
+                () -> assertEquals("added: [T][ ] read book", addResponse),
+                () -> assertTrue(markResponse.contains("[T][X] read book"))
+        );
+    }
+
     /** Verifies that the help command lists every supported command and input format. */
     @Test
     public void getResponse_helpCommand_listsAvailableCommands() {
@@ -165,6 +179,22 @@ public class DuchessTest {
         assertEquals("OOPS!!! Please use 'stats' without arguments.", response);
     }
 
+    /** Verifies that every argument-free command rejects unexpected parameters. */
+    @Test
+    public void getResponse_argumentFreeCommandsWithArguments_returnHelpfulErrors() {
+        Duchess duchess = createDuchess(new TaskList());
+
+        assertAll(
+                () -> assertEquals("OOPS!!! Please use 'list' without arguments.",
+                        duchess.getResponse("list now")),
+                () -> assertEquals("OOPS!!! Please use 'help' without arguments.",
+                        duchess.getResponse("help now")),
+                () -> assertEquals("OOPS!!! Please use 'bye' without arguments.",
+                        duchess.getResponse("bye now")),
+                () -> assertFalse(duchess.isExitRequested())
+        );
+    }
+
     /** Verifies that adding and finding commands share the same task state. */
     @Test
     public void getResponse_addAndFindCommands_shareTaskState() {
@@ -177,6 +207,32 @@ public class DuchessTest {
         assertEquals("Here are the matching tasks in your list:\n"
                 + "1.[T][ ] read book\n"
                 + "2.[D][ ] return book (by: Dec 02 2019)", response);
+    }
+
+    /** Verifies that equivalent task details cannot be added twice. */
+    @Test
+    public void getResponse_duplicateTask_returnsErrorWithoutAddingTask() {
+        TaskList tasks = new TaskList();
+        Duchess duchess = createDuchess(tasks);
+
+        duchess.getResponse("deadline Submit   Report /by 2026-09-30");
+        String response = duchess.getResponse("deadline submit report /by 2026-09-30");
+
+        assertAll(
+                () -> assertEquals("OOPS!!! That task already exists in your list.", response),
+                () -> assertEquals("error", duchess.getCommandType()),
+                () -> assertEquals(1, tasks.size())
+        );
+    }
+
+    /** Verifies that indexed commands explain when no task can be selected. */
+    @Test
+    public void getResponse_taskNumberOnEmptyList_returnsEmptyListError() {
+        Duchess duchess = createDuchess(new TaskList());
+
+        String response = duchess.getResponse("delete 1");
+
+        assertEquals("OOPS!!! Your task list is empty, so there is no task to update.", response);
     }
 
     /** Verifies that mark, unmark, and delete commands update task state in order. */

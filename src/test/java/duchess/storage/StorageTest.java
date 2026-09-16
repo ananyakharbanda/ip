@@ -67,6 +67,21 @@ public class StorageTest {
         assertEquals("valid task", restored.get(0).getDescription());
     }
 
+    /** Verifies that duplicate records in an unexpected data file are loaded once. */
+    @Test
+    public void storage_duplicateRecords_loadsSingleTask() throws Exception {
+        Path dataFile = temporaryDirectory.resolve("duchess.txt");
+        Storage storage = new Storage(dataFile);
+        storage.saveTasks(new TaskList(new Todo("read book")));
+        String record = Files.readString(dataFile, StandardCharsets.UTF_8);
+        Files.writeString(dataFile, record + record, StandardCharsets.UTF_8);
+
+        TaskList restored = storage.loadTasks();
+
+        assertEquals(1, restored.size());
+        assertEquals("read book", restored.get(0).getDescription());
+    }
+
     /** Verifies that completed records from the legacy format remain readable. */
     @Test
     public void storage_legacyCompletedRecord_loadsWithoutTimestamp() throws Exception {

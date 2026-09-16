@@ -36,6 +36,20 @@ public class TaskList {
     }
 
     /**
+     * Returns whether the list already contains a task with the same type and details.
+     *
+     * <p>Letter case and repeated whitespace are ignored so superficial input
+     * differences cannot create duplicate records.</p>
+     *
+     * @param candidate the task whose details should be compared
+     * @return {@code true} if an equivalent task is already present
+     */
+    public boolean containsEquivalent(Task candidate) {
+        assert candidate != null : "A duplicate check requires a task";
+        return tasks.stream().anyMatch(task -> hasSameDetails(task, candidate));
+    }
+
+    /**
      * Returns the task at a zero-based index.
      *
      * @param index the zero-based task index
@@ -135,6 +149,33 @@ public class TaskList {
         return task.isDone() && completedAt != null
                 && !completedAt.isBefore(periodStart)
                 && !completedAt.isAfter(periodEnd);
+    }
+
+    /** Returns whether two tasks have the same user-entered details. */
+    private boolean hasSameDetails(Task first, Task second) {
+        if (first.getType() != second.getType()
+                || !normalizeText(first.getDescription()).equals(normalizeText(second.getDescription()))) {
+            return false;
+        }
+        if (first instanceof Deadline firstDeadline && second instanceof Deadline secondDeadline) {
+            return firstDeadline.getBy().equals(secondDeadline.getBy());
+        }
+        if (first instanceof Event firstEvent && second instanceof Event secondEvent) {
+            if (firstEvent.hasDateRange() != secondEvent.hasDateRange()) {
+                return false;
+            }
+            if (firstEvent.hasDateRange()) {
+                return firstEvent.getFrom().equals(secondEvent.getFrom())
+                        && firstEvent.getTo().equals(secondEvent.getTo());
+            }
+            return normalizeText(firstEvent.getAt()).equals(normalizeText(secondEvent.getAt()));
+        }
+        return true;
+    }
+
+    /** Normalizes human-entered text for duplicate comparisons. */
+    private String normalizeText(String value) {
+        return value.strip().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT);
     }
 
     /** Documents the index precondition shared by operations on one task. */
