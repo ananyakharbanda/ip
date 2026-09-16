@@ -7,7 +7,7 @@
     squad-blue: #245576;
     badge-coral: #ef8c6d;
     -fx-background-color: app-background;
-    -fx-font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+    -fx-font-family: "System";
 }
 
 .app-shell {
@@ -37,7 +37,7 @@
 .brand-title {
     -fx-background-color: transparent;
     -fx-text-fill: white;
-    -fx-font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+    -fx-font-family: "System";
     -fx-font-size: 19px;
     -fx-font-weight: bold;
 }

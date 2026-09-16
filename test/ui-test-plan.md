@@ -894,8 +894,9 @@ Squad playbook:
   case <description> — Squad alias for todo.
 • deadline <description> /by <date> — Add a deadline task.
   timer <description> /by <date> — Squad alias for deadline.
-• event <description> /at <time> — Add an event task.
-  briefing <description> /at <time> — Squad alias for event.
+• event <description> /from <date> /to <date> — Add an event.
+  briefing <description> /from <date> /to <date> — Squad alias for event.
+  Dates use yyyy-MM-dd. Legacy /at <time> is also supported.
 • list / rollcall — Show all tasks.
 • stats / report — Show task statistics.
 • find <keyword> / intel <keyword> — Find tasks by keyword.
@@ -940,6 +941,60 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test case 20: Event date ranges and rejected additions
+
+Aim: Verify range display and completion, and ensure invalid event ranges do not alter the list.
+
+Inputs:
+```text
+event orientation /from 2026-09-15 /to 2026-09-17
+event invalid /from 2026-02-30 /to 2026-03-01
+event reversed /from 2026-09-17 /to 2026-09-15
+event incomplete /from 2026-09-15
+list
+mark 1
+list
+bye
+```
+
+Expected output:
+```text
+____________________________________________________________
++------------------------+
+|        Duchess         |
++------------------------+
+Hello! I'm Duchess.
+What can I do for you?
+____________________________________________________________
+____________________________________________________________
+added: [E][ ] orientation (from: Sep 15 2026 to: Sep 17 2026)
+____________________________________________________________
+____________________________________________________________
+OOPS!!! The event dates are invalid. Use yyyy-MM-dd.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! The event end date cannot be before its start date.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! Use event <description> /from <yyyy-MM-dd> /to <yyyy-MM-dd>.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[E][ ] orientation (from: Sep 15 2026 to: Sep 17 2026)
+____________________________________________________________
+____________________________________________________________
+Nice! I've marked this task as done:
+  [E][X] orientation (from: Sep 15 2026 to: Sep 17 2026)
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[E][X] orientation (from: Sep 15 2026 to: Sep 17 2026)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

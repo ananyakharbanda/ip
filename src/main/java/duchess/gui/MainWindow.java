@@ -1,6 +1,7 @@
 package duchess.gui;
 
 import duchess.Duchess;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 
@@ -83,6 +84,8 @@ public class MainWindow extends VBox {
         if (duchess.isExitRequested()) {
             composer.setInputDisabled(true);
             header.setHelpDisabled(true);
+            quickCommands.setDisable(true);
+            Platform.exit();
         }
     }
 
@@ -95,7 +98,7 @@ public class MainWindow extends VBox {
     private void updateStatus(String commandType) {
         switch (commandType) {
             case "add", "mark", "unmark" -> {
-                header.updateStatus("✦ Court updated", "status-success");
+                header.updateStatus("✦ Squad updated", "status-success");
             }
             case "delete" -> {
                 header.updateStatus("✦ Record removed", "status-success");

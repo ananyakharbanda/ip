@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Instant;
@@ -22,6 +23,18 @@ import duchess.task.Todo;
 public class DuchessTest {
     @TempDir
     private Path temporaryDirectory;
+
+    /** Verifies that an unsaved change is displayed as an error in the GUI. */
+    @Test
+    public void getResponse_saveFailure_setsErrorStyle() throws Exception {
+        Path blockedParent = temporaryDirectory.resolve("not-a-directory");
+        Files.writeString(blockedParent, "block directory creation");
+        Duchess duchess = new Duchess(new Storage(blockedParent.resolve("tasks.txt")), new TaskList());
+        String response = duchess.getResponse("todo read book");
+        assertTrue(response.contains("couldn't save"));
+        assertEquals("error", duchess.getCommandType());
+        assertTrue(duchess.getResponse("list").contains("read book"));
+    }
 
     /** Verifies that the GUI-facing response includes the current task list. */
     @Test
@@ -47,7 +60,7 @@ public class DuchessTest {
         assertAll(
                 () -> assertTrue(response.contains("todo <description>")),
                 () -> assertTrue(response.contains("deadline <description> /by <date>")),
-                () -> assertTrue(response.contains("event <description> /at <time>")),
+                () -> assertTrue(response.contains("event <description> /from <date> /to <date>")),
                 () -> assertTrue(response.contains("find <keyword>")),
                 () -> assertTrue(response.contains("case <description>")),
                 () -> assertTrue(response.contains("rollcall")),

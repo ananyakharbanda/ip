@@ -52,13 +52,34 @@ public final class Parser {
             }
         }
         if (lowerCaseCommand.equals("event") || lowerCaseCommand.startsWith("event ")) {
-            String[] details = splitTaskDetails(normalizedCommand.substring("event".length()), "/at");
+            String eventDetails = normalizedCommand.substring("event".length());
+            if (eventDetails.toLowerCase(Locale.ROOT).contains("/from")
+                    || eventDetails.toLowerCase(Locale.ROOT).contains("/to")) {
+                return parseEventRange(eventDetails);
+            }
+            String[] details = splitTaskDetails(eventDetails, "/at");
             validateTaskDetails("event", details, "/at");
             return new Event(details[0], details[1]);
         }
 
         throw new DuchessException("OOPS!!! I'm sorry, but I don't know what that means :-(\n"
                 + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
+    }
+
+    /** Parses an event's required description and ISO start/end dates. */
+    private static Event parseEventRange(String eventDetails) throws DuchessException {
+        String[] startDetails = splitTaskDetails(eventDetails, "/from");
+        String[] endDetails = splitTaskDetails(startDetails[1], "/to");
+        if (startDetails[0].isBlank() || endDetails[0].isBlank() || endDetails[1].isBlank()) {
+            throw new DuchessException("OOPS!!! Use event <description> /from <yyyy-MM-dd> /to <yyyy-MM-dd>.");
+        }
+        try {
+            return new Event(startDetails[0], endDetails[0], endDetails[1]);
+        } catch (DateTimeParseException exception) {
+            throw new DuchessException("OOPS!!! The event dates are invalid. Use yyyy-MM-dd.");
+        } catch (IllegalArgumentException exception) {
+            throw new DuchessException("OOPS!!! The event end date cannot be before its start date.");
+        }
     }
 
     /** Converts squad-room task aliases into their original command names. */
@@ -101,7 +122,7 @@ public final class Parser {
      * @return a two-element array containing description and detail
      */
     private static String[] splitTaskDetails(String taskDetails, String marker) {
-        int markerIndex = taskDetails.toLowerCase().indexOf(marker.toLowerCase());
+        int markerIndex = taskDetails.toLowerCase(Locale.ROOT).indexOf(marker.toLowerCase(Locale.ROOT));
         if (markerIndex < 0) {
             return new String[]{taskDetails.trim(), ""};
         }

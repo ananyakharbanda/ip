@@ -15,9 +15,9 @@
         <VBox spacing="2.0">
             <Label text="Duchess" styleClass="brand-title" />
             <Label text="Your precinct task partner" styleClass="brand-subtitle" />
+            <Label fx:id="statusLabel" text="✦ Squad ready" styleClass="status-pill, status-ready" />
         </VBox>
         <Region HBox.hgrow="ALWAYS" />
-        <Label fx:id="statusLabel" text="✦ Squad ready" styleClass="status-pill status-ready" />
         <Button fx:id="helpButton"
                 mnemonicParsing="false"
                 onAction="#handleHelp"

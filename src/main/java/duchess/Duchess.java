@@ -36,8 +36,9 @@ public class Duchess {
               case <description> — Squad alias for todo.
             • deadline <description> /by <date> — Add a deadline task.
               timer <description> /by <date> — Squad alias for deadline.
-            • event <description> /at <time> — Add an event task.
-              briefing <description> /at <time> — Squad alias for event.
+            • event <description> /from <date> /to <date> — Add an event.
+              briefing <description> /from <date> /to <date> — Squad alias for event.
+              Dates use yyyy-MM-dd. Legacy /at <time> is also supported.
             • list / rollcall — Show all tasks.
             • stats / report — Show task statistics.
             • find <keyword> / intel <keyword> — Find tasks by keyword.
@@ -260,6 +261,7 @@ public class Duchess {
             storage.saveTasks(tasks);
             return response;
         } catch (java.io.IOException exception) {
+            commandType = COMMAND_TYPE_ERROR;
             return SAVE_ERROR + "\n" + response;
         }
     }

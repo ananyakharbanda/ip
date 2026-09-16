@@ -35,7 +35,7 @@
     -fx-border-radius: 12px 12px 12px 3px;
     -fx-padding: 9px 12px;
     -fx-text-fill: #2e3545;
-    -fx-font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+    -fx-font-family: "System";
     -fx-font-size: 13px;
     -fx-font-style: normal;
     -fx-font-weight: normal;
@@ -60,17 +60,17 @@
     -fx-border-color: #b8d9da;
 }
 
-.add-label {
+.duchess-row .add-label {
     -fx-background-color: #fff5ce;
     -fx-border-color: #e8cc79;
 }
 
-.marked-label {
+.duchess-row .marked-label {
     -fx-background-color: #e9f7ed;
     -fx-border-color: #b6ddc2;
 }
 
-.delete-label {
+.duchess-row .delete-label {
     -fx-background-color: #fff0ed;
     -fx-border-color: #efc0b4;
 }
@@ -83,7 +83,7 @@
     -fx-text-fill: #b23a43;
 }
 
-.error-label {
+.duchess-row .error-label {
     -fx-background-color: #fff0f0;
     -fx-border-color: #e2a0a5;
     -fx-border-width: 1px 1px 1px 4px;
