@@ -3,7 +3,7 @@
 Duchess is your squad task partner: a desktop chatbot that helps you organise
 things to do, track deadlines and events, and see your progress.
 
-![Duchess showing a task roster and completion statistics](Ui.png)
+<img src="Ui.png" alt="Duchess showing a task roster and completion statistics" width="400">
 
 [Quick start](#quick-start) · [Features](#features) · [Saving and recovery](#saving-and-recovery)
 
