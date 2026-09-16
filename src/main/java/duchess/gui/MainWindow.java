@@ -1,6 +1,7 @@
 package duchess.gui;
 
 import duchess.Duchess;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 
@@ -39,8 +40,8 @@ public class MainWindow extends VBox {
     public void setDuchess(Duchess duchess) {
         this.duchess = duchess;
         conversationView.addDialogs(
-                DialogBox.getDuchessDialog("👋 Hello! I'm Duchess.\n\nType help or click Help to "
-                                + "see the available commands.", "welcome"));
+                DialogBox.getDuchessDialog("👋 Hey, squad! I'm Duchess, your precinct task partner.\n\n"
+                                + "Give me your next case, or open Help for the playbook.", "welcome"));
         composer.requestInputFocus();
     }
 
@@ -83,6 +84,8 @@ public class MainWindow extends VBox {
         if (duchess.isExitRequested()) {
             composer.setInputDisabled(true);
             header.setHelpDisabled(true);
+            quickCommands.setDisable(true);
+            Platform.exit();
         }
     }
 
@@ -95,7 +98,7 @@ public class MainWindow extends VBox {
     private void updateStatus(String commandType) {
         switch (commandType) {
             case "add", "mark", "unmark" -> {
-                header.updateStatus("✦ Court updated", "status-success");
+                header.updateStatus("✦ Squad updated", "status-success");
             }
             case "delete" -> {
                 header.updateStatus("✦ Record removed", "status-success");
@@ -110,7 +113,7 @@ public class MainWindow extends VBox {
                 header.updateStatus("✦ Guide open", "status-ready");
             }
             default -> {
-                header.updateStatus("✦ Palace ready", "status-ready");
+                header.updateStatus("✦ Squad ready", "status-ready");
             }
         }
     }

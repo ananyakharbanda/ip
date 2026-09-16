@@ -132,6 +132,10 @@ public class Storage {
             return type + "|" + status + "|" + description + "|" + encode(deadline.getBy().toString())
                     + "|" + completionTime;
         }
+        if (task instanceof Event event && event.hasDateRange()) {
+            return type + "|" + status + "|" + description + "|" + encode(event.getFrom().toString())
+                    + "|" + encode(event.getTo().toString()) + "|" + completionTime;
+        }
         if (task instanceof Event event) {
             return type + "|" + status + "|" + description + "|" + encode(event.getAt())
                     + "|" + completionTime;
@@ -183,6 +187,18 @@ public class Storage {
                 return null;
             }
             completionField = fields.length == 5 ? fields[4] : "";
+        } else if (fields[0].equals("E") && fields.length == 6) {
+            String from = decode(fields[3]);
+            String to = decode(fields[4]);
+            if (from == null || to == null) {
+                return null;
+            }
+            try {
+                task = new Event(description, from, to);
+            } catch (IllegalArgumentException | DateTimeParseException exception) {
+                return null;
+            }
+            completionField = fields[5];
         } else if (fields[0].equals("E") && (fields.length == 4 || fields.length == 5)) {
             String at = decode(fields[3]);
             if (at == null || at.isBlank()) {

@@ -1,8 +1,10 @@
 # Duchess User Guide
 
-Duchess is a task manager that supports todos, deadlines, events, searching,
-completion tracking, and completion statistics. The same command behavior is
-available from the command-line interface and the JavaFX graphical interface.
+Duchess is a task manager with an original squad-room personality. She keeps
+responses quick-witted, supportive, and lightly deadpan while helping users
+manage todos, deadlines, events, searches, and completion statistics. The same
+command behavior is available from the command-line interface and the JavaFX
+graphical interface.
 
 ## Running Duchess
 
@@ -38,10 +40,15 @@ For example, `deadline submit report /by 2026-09-30` creates a deadline task.
 Add an event with:
 
 ```text
-event <description> /at <time>
+event <description> /from <yyyy-MM-dd> /to <yyyy-MM-dd>
 ```
 
-For example, `event team meeting /at Friday 3pm` creates an event task.
+For example, `event orientation /from 2026-09-15 /to 2026-09-17` creates
+an event with an inclusive date range. Same-day events are allowed. The end
+date must not precede the start date. Dates display as `Sep 15 2026`.
+
+Existing events and the legacy `event <description> /at <time>` form remain
+supported, preserving their original free-text times.
 
 ### View and search tasks
 
@@ -93,5 +100,6 @@ Use `help` to display the supported commands and `bye` to exit Duchess.
 
 The graphical interface uses JavaFX controls for the application window,
 conversation area, command buttons, and composer. Its stable page structure is
-declared in FXML, while dynamic task responses and dialogs are built in JavaFX
-code so that they can react to the current application state.
+declared in FXML. Each new message loads that reusable FXML layout; its Java
+controller fills in the response text and applies the appropriate style.
+Help uses the same response as the console interface.

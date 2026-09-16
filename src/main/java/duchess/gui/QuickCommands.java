@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.FlowPane;
 
 /** A reusable JavaFX strip containing shortcuts for common Duchess commands. */
-public class QuickCommands extends HBox {
+public class QuickCommands extends FlowPane {
     /** Action to run when the list shortcut is pressed. */
     private Runnable listAction = () -> { };
 

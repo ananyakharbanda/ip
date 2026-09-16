@@ -1,8 +1,10 @@
-# Duchess ✦ Royal Task Companion
+# Duchess ✦ Squad Task Desk
 
 Duchess is a Java 25 task manager with both a command-line interface and a
-JavaFX graphical interface. It supports todos, deadlines, events, searching,
-completion tracking, and completion statistics.
+JavaFX graphical interface. She has an original squad-room personality: quick-
+witted, supportive, lightly deadpan, and focused on keeping every case file in
+order. She supports todos, deadlines, events, searching, completion tracking,
+and completion statistics.
 
 ## Features
 

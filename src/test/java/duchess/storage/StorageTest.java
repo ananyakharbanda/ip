@@ -92,4 +92,36 @@ public class StorageTest {
         assertEquals(0, restored.size());
     }
 
+    /** Verifies date ranges survive a restart alongside legacy events and completion times. */
+    @Test
+    public void storage_eventRange_preservesDatesAndCompletion() throws Exception {
+        Storage storage = new Storage(temporaryDirectory.resolve("events.txt"));
+        Event event = new Event("orientation | tour", "2026-09-15", "2026-09-17");
+        Instant completedAt = Instant.parse("2026-09-17T12:00:00Z");
+        event.markAsDone(completedAt);
+        storage.saveTasks(new TaskList(event, new Event("old meeting", "Monday")));
+
+        TaskList restored = storage.loadTasks();
+        Event restoredEvent = (Event) restored.get(0);
+        assertEquals(2, restored.size());
+        assertEquals(event.toString(), restoredEvent.toString());
+        assertEquals(event.getFrom(), restoredEvent.getFrom());
+        assertEquals(event.getTo(), restoredEvent.getTo());
+        assertEquals(completedAt, restoredEvent.getCompletedAt());
+        assertEquals("Monday", ((Event) restored.get(1)).getAt());
+    }
+
+    /** Verifies corrupt dated events are skipped without losing adjacent valid tasks. */
+    @Test
+    public void storage_invalidEventDates_skipsRecord() throws Exception {
+        Path dataFile = temporaryDirectory.resolve("events.txt");
+        Storage storage = new Storage(dataFile);
+        storage.saveTasks(new TaskList(new Event("meeting", "2026-09-15", "2026-09-17"), new Todo("keep")));
+        String invalidDate = Base64.getEncoder().encodeToString("2026-02-30".getBytes(StandardCharsets.UTF_8));
+        String validDate = Base64.getEncoder().encodeToString("2026-09-15".getBytes(StandardCharsets.UTF_8));
+        Files.writeString(dataFile, Files.readString(dataFile).replace(validDate, invalidDate));
+        TaskList restored = storage.loadTasks();
+        assertEquals(1, restored.size());
+        assertEquals("keep", restored.get(0).getDescription());
+    }
 }

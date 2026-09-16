@@ -23,7 +23,7 @@
 }
 
 .user-row .speaker-label {
-    -fx-text-fill: #6f6780;
+    -fx-text-fill: #56717b;
     -fx-alignment: CENTER_RIGHT;
 }
 
@@ -35,39 +35,42 @@
     -fx-border-radius: 12px 12px 12px 3px;
     -fx-padding: 9px 12px;
     -fx-text-fill: #2e3545;
+    -fx-font-family: "System";
     -fx-font-size: 13px;
+    -fx-font-style: normal;
+    -fx-font-weight: normal;
     -fx-line-spacing: 2px;
     -fx-effect: dropshadow(gaussian, rgba(53, 43, 74, 0.08), 7, 0.12, 0, 1);
 }
 
 .user-row .dialog-label {
-    -fx-background-color: #e9e6f3;
-    -fx-border-color: #d5cee5;
+    -fx-background-color: #d9eef0;
+    -fx-border-color: #9dcdd1;
     -fx-background-radius: 12px 12px 3px 12px;
     -fx-border-radius: 12px 12px 3px 12px;
-    -fx-text-fill: #39324a;
+    -fx-text-fill: #214254;
 }
 
 .duchess-row .speaker-label {
-    -fx-text-fill: #9b7324;
+    -fx-text-fill: #28707a;
 }
 
 .duchess-row .dialog-label {
-    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f4effc);
-    -fx-border-color: #d8c8ed;
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #eaf5f5);
+    -fx-border-color: #b8d9da;
 }
 
-.add-label {
+.duchess-row .add-label {
     -fx-background-color: #fff5ce;
     -fx-border-color: #e8cc79;
 }
 
-.marked-label {
+.duchess-row .marked-label {
     -fx-background-color: #e9f7ed;
     -fx-border-color: #b6ddc2;
 }
 
-.delete-label {
+.duchess-row .delete-label {
     -fx-background-color: #fff0ed;
     -fx-border-color: #efc0b4;
 }
@@ -80,7 +83,7 @@
     -fx-text-fill: #b23a43;
 }
 
-.error-label {
+.duchess-row .error-label {
     -fx-background-color: #fff0f0;
     -fx-border-color: #e2a0a5;
     -fx-border-width: 1px 1px 1px 4px;

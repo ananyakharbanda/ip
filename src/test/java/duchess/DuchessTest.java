@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Instant;
@@ -22,6 +23,18 @@ import duchess.task.Todo;
 public class DuchessTest {
     @TempDir
     private Path temporaryDirectory;
+
+    /** Verifies that an unsaved change is displayed as an error in the GUI. */
+    @Test
+    public void getResponse_saveFailure_setsErrorStyle() throws Exception {
+        Path blockedParent = temporaryDirectory.resolve("not-a-directory");
+        Files.writeString(blockedParent, "block directory creation");
+        Duchess duchess = new Duchess(new Storage(blockedParent.resolve("tasks.txt")), new TaskList());
+        String response = duchess.getResponse("todo read book");
+        assertTrue(response.contains("couldn't save"));
+        assertEquals("error", duchess.getCommandType());
+        assertTrue(duchess.getResponse("list").contains("read book"));
+    }
 
     /** Verifies that the GUI-facing response includes the current task list. */
     @Test
@@ -47,8 +60,12 @@ public class DuchessTest {
         assertAll(
                 () -> assertTrue(response.contains("todo <description>")),
                 () -> assertTrue(response.contains("deadline <description> /by <date>")),
-                () -> assertTrue(response.contains("event <description> /at <time>")),
+                () -> assertTrue(response.contains("event <description> /from <date> /to <date>")),
                 () -> assertTrue(response.contains("find <keyword>")),
+                () -> assertTrue(response.contains("case <description>")),
+                () -> assertTrue(response.contains("rollcall")),
+                () -> assertTrue(response.contains("intel <keyword>")),
+                () -> assertTrue(response.contains("signoff")),
                 () -> assertTrue(response.contains("mark <task number>")),
                 () -> assertTrue(response.contains("unmark <task number>")),
                 () -> assertTrue(response.contains("delete <task number>")),
@@ -56,6 +73,50 @@ public class DuchessTest {
                 () -> assertTrue(response.contains("bye")),
                 () -> assertEquals("help", duchess.getCommandType())
         );
+    }
+
+    /** Verifies that squad aliases preserve the behavior of their canonical commands. */
+    @Test
+    public void getResponse_squadAliases_preserveCommandBehavior() {
+        Duchess duchess = createDuchess(new TaskList());
+
+        String addResponse = duchess.getResponse("case read book");
+        String deadlineResponse = duchess.getResponse("timer return book /by 2026-09-30");
+        String eventResponse = duchess.getResponse("briefing team meeting /at Friday 3pm");
+        String findResponse = duchess.getResponse("intel book");
+        String closeResponse = duchess.getResponse("close 1");
+        String reopenResponse = duchess.getResponse("reopen 1");
+        String archiveResponse = duchess.getResponse("archive 2");
+        String rollcallResponse = duchess.getResponse("rollcall");
+        String reportResponse = duchess.getResponse("report");
+        String briefResponse = duchess.getResponse("brief");
+
+        assertAll(
+                () -> assertTrue(addResponse.startsWith("added:")),
+                () -> assertTrue(deadlineResponse.startsWith("added:")),
+                () -> assertTrue(eventResponse.startsWith("added:")),
+                () -> assertTrue(findResponse.contains("read book")),
+                () -> assertTrue(closeResponse.contains("marked this task as done")),
+                () -> assertTrue(reopenResponse.contains("marked this task as not done")),
+                () -> assertTrue(archiveResponse.contains("removed this task")),
+                () -> assertTrue(rollcallResponse.contains("Here are the tasks")),
+                () -> assertTrue(reportResponse.contains("Task statistics:")),
+                () -> assertTrue(briefResponse.contains("Squad playbook:"))
+        );
+
+        duchess.getResponse("signoff");
+        assertTrue(duchess.isExitRequested());
+    }
+
+    /** Verifies that the help response communicates Duchess's squad-room personality. */
+    @Test
+    public void getResponse_helpCommand_usesSquadRoomVoice() {
+        Duchess duchess = createDuchess(new TaskList());
+
+        String response = duchess.getResponse("help");
+
+        assertTrue(response.contains("The squad desk is open."));
+        assertTrue(response.contains("I'll keep the banter light and your case file organized."));
     }
 
     /** Verifies that the GUI can process the command used to end a conversation. */

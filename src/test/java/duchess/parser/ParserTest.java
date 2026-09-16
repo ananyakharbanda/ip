@@ -194,6 +194,34 @@ public class ParserTest {
         assertEquals(-1, Parser.parseTaskIndex("mark 2147483648", "mark "));
     }
 
+    /** Verifies date ranges and their case-insensitive squad alias. */
+    @Test
+    public void parseTask_eventRange_parsesDates() throws DuchessException {
+        Event event = assertInstanceOf(Event.class,
+                Parser.parseTask("BRIEFING orientation /FROM 2026-09-15 /TO 2026-09-17"));
+        assertEquals("orientation", event.getDescription());
+        assertEquals(LocalDate.of(2026, 9, 15), event.getFrom());
+        assertEquals(LocalDate.of(2026, 9, 17), event.getTo());
+    }
+
+    /** Verifies malformed ranges cannot be accepted as legacy event text. */
+    @Test
+    public void parseTask_invalidEventRange_throwsDuchessException() {
+        String[] invalidCommands = {
+            "event /from 2026-09-15 /to 2026-09-17",
+            "event meeting /from 2026-09-15",
+            "event meeting /to 2026-09-17",
+            "event meeting /from /to 2026-09-17",
+            "event meeting /from 2026-09-15 /to",
+            "event meeting /from 2026-02-30 /to 2026-03-01",
+            "event meeting /from 2026-09-17 /to 2026-09-15",
+            "event meeting /from 2026-09-15 /to 2026-09-17 /to 2026-09-18"
+        };
+        for (String command : invalidCommands) {
+            assertThrows(DuchessException.class, () -> Parser.parseTask(command), command);
+        }
+    }
+
     /** Asserts that parsing a command fails with the expected user-facing message. */
     private void assertParseTaskFailsWithMessage(String command, String expectedMessage) {
         DuchessException exception = assertThrows(DuchessException.class,
