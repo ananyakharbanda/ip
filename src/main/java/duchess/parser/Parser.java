@@ -153,7 +153,8 @@ public final class Parser {
             return new String[]{taskDetails.trim(), ""};
         }
         if (markers.size() > 1) {
-            throw new DuchessException("OOPS!!! A " + taskType + " must contain exactly one "
+            String article = taskType.equals("event") ? "An" : "A";
+            throw new DuchessException("OOPS!!! " + article + " " + taskType + " must contain exactly one "
                     + marker + " parameter.");
         }
 

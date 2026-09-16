@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
@@ -43,6 +44,19 @@ public class TaskTest {
         );
     }
 
+    /** Verifies that a known time can replace a missing legacy completion time. */
+    @Test
+    public void task_unknownCompletion_storesLaterKnownTime() {
+        Instant knownCompletion = Instant.parse("2026-09-11T00:00:00Z");
+        Task task = new Task("legacy task");
+        task.markAsDone(null);
+
+        task.markAsDone(knownCompletion);
+
+        assertTrue(task.isDone());
+        assertEquals(knownCompletion, task.getCompletedAt());
+    }
+
     /** Verifies that unmarking a task clears both completion state and timestamp. */
     @Test
     public void task_markAsNotDone_clearsCompletionState() {
@@ -55,6 +69,16 @@ public class TaskTest {
                 () -> assertFalse(task.isDone()),
                 () -> assertEquals(" ", task.getStatusIcon()),
                 () -> assertNull(task.getCompletedAt())
+        );
+    }
+
+    /** Verifies assertion-based constructor preconditions. */
+    @Test
+    public void task_invalidConstructorArguments_throwAssertionError() {
+        assertAll(
+                () -> assertThrows(AssertionError.class, () -> new Task(null)),
+                () -> assertThrows(AssertionError.class, () -> new Task("   ")),
+                () -> assertThrows(AssertionError.class, () -> new Task("task", null))
         );
     }
 }

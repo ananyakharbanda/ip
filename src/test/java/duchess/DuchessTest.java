@@ -3,6 +3,7 @@ package duchess;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
@@ -23,6 +24,29 @@ import duchess.task.Todo;
 public class DuchessTest {
     @TempDir
     private Path temporaryDirectory;
+
+    /** Verifies that the storage-backed constructor restores persisted tasks. */
+    @Test
+    public void constructor_nullTaskList_loadsTasksFromStorage() throws Exception {
+        Storage storage = new Storage(dataFile());
+        storage.saveTasks(new TaskList(new Todo("saved task")));
+
+        Duchess duchess = new Duchess(storage, null);
+
+        assertEquals("Here are the tasks in your list:\n1.[T][ ] saved task",
+                duchess.getResponse("list"));
+    }
+
+    /** Verifies collaborator preconditions used by the application constructor. */
+    @Test
+    public void constructor_nullCollaborator_throwsAssertionError() {
+        assertAll(
+                () -> assertThrows(AssertionError.class,
+                        () -> new Duchess(null, new TaskList(), Clock.systemUTC())),
+                () -> assertThrows(AssertionError.class,
+                        () -> new Duchess(new Storage(dataFile()), new TaskList(), null))
+        );
+    }
 
     /** Verifies that an unsaved change is displayed as an error in the GUI. */
     @Test
@@ -48,6 +72,30 @@ public class DuchessTest {
                 () -> assertEquals("list", duchess.getCommandType()),
                 () -> assertFalse(duchess.isExitRequested())
         );
+    }
+
+    /** Verifies that a populated list is numbered in insertion order. */
+    @Test
+    public void getResponse_listCommandWithTasks_returnsNumberedTasks() {
+        Duchess duchess = createDuchess(new TaskList(
+                new Todo("first task"), new Todo("second task")));
+
+        String response = duchess.getResponse("list");
+
+        assertEquals("Here are the tasks in your list:\n"
+                + "1.[T][ ] first task\n"
+                + "2.[T][ ] second task", response);
+    }
+
+    /** Verifies that null input is handled as an empty command. */
+    @Test
+    public void getResponse_nullCommand_returnsEmptyCommandError() {
+        Duchess duchess = createDuchess(new TaskList());
+
+        String response = duchess.getResponse(null);
+
+        assertTrue(response.startsWith("OOPS!!! A command cannot be empty."));
+        assertEquals("error", duchess.getCommandType());
     }
 
     /** Verifies that leading, trailing, and repeated command whitespace is harmless. */
@@ -209,6 +257,21 @@ public class DuchessTest {
                 + "2.[D][ ] return book (by: Dec 02 2019)", response);
     }
 
+    /** Verifies missing and unmatched searches return stable, helpful responses. */
+    @Test
+    public void getResponse_findMissingOrUnmatchedKeyword_returnsExpectedResponses() {
+        Duchess duchess = createDuchess(new TaskList(new Todo("read book")));
+
+        String missingKeywordResponse = duchess.getResponse("find");
+        String unmatchedKeywordResponse = duchess.getResponse("find code");
+
+        assertAll(
+                () -> assertEquals("OOPS!!! Please use 'find <keyword>', for example: find book.",
+                        missingKeywordResponse),
+                () -> assertEquals("Here are the matching tasks in your list:", unmatchedKeywordResponse)
+        );
+    }
+
     /** Verifies that equivalent task details cannot be added twice. */
     @Test
     public void getResponse_duplicateTask_returnsErrorWithoutAddingTask() {
@@ -233,6 +296,25 @@ public class DuchessTest {
         String response = duchess.getResponse("delete 1");
 
         assertEquals("OOPS!!! Your task list is empty, so there is no task to update.", response);
+    }
+
+    /** Verifies missing numbers and out-of-range numbers are rejected without mutation. */
+    @Test
+    public void getResponse_invalidIndexedCommands_returnSpecificErrors() {
+        TaskList tasks = new TaskList(new Todo("only task"));
+        Duchess duchess = createDuchess(tasks);
+
+        assertAll(
+                () -> assertEquals("OOPS!!! Please use 'mark <task number>', for example: mark 1.",
+                        duchess.getResponse("mark")),
+                () -> assertEquals("OOPS!!! Please use 'unmark <task number>', for example: unmark 1.",
+                        duchess.getResponse("unmark")),
+                () -> assertEquals("OOPS!!! Please use 'delete <task number>', for example: delete 1.",
+                        duchess.getResponse("delete")),
+                () -> assertEquals("OOPS!!! Please provide a valid task number between 1 and 1.",
+                        duchess.getResponse("delete 2")),
+                () -> assertEquals(1, tasks.size())
+        );
     }
 
     /** Verifies that mark, unmark, and delete commands update task state in order. */

@@ -2,6 +2,7 @@ package duchess.task;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,5 +28,17 @@ public class TaskStatisticsTest {
         TaskStatistics statistics = new TaskStatistics(0, 0, 0);
 
         assertEquals(0, statistics.getCompletionRatePercentage());
+    }
+
+    /** Verifies assertion-based count invariants. */
+    @Test
+    public void statistics_invalidCounts_throwAssertionError() {
+        assertAll(
+                () -> assertThrows(AssertionError.class, () -> new TaskStatistics(-1, 0, 0)),
+                () -> assertThrows(AssertionError.class, () -> new TaskStatistics(1, -1, 0)),
+                () -> assertThrows(AssertionError.class, () -> new TaskStatistics(1, 2, 0)),
+                () -> assertThrows(AssertionError.class, () -> new TaskStatistics(1, 1, -1)),
+                () -> assertThrows(AssertionError.class, () -> new TaskStatistics(1, 1, 2))
+        );
     }
 }

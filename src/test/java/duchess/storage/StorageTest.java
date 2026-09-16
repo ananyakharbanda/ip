@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.charset.StandardCharsets;
@@ -82,6 +83,19 @@ public class StorageTest {
         assertEquals("read book", restored.get(0).getDescription());
     }
 
+    /** Verifies that saving an empty list creates a readable empty data file. */
+    @Test
+    public void storage_emptyTaskList_savesAndLoadsEmptyFile() throws Exception {
+        Path dataFile = temporaryDirectory.resolve("nested").resolve("empty.txt");
+        Storage storage = new Storage(dataFile);
+
+        storage.saveTasks(new TaskList());
+
+        assertTrue(Files.isRegularFile(dataFile));
+        assertEquals(0, Files.size(dataFile));
+        assertEquals(0, storage.loadTasks().size());
+    }
+
     /** Verifies that completed records from the legacy format remain readable. */
     @Test
     public void storage_legacyCompletedRecord_loadsWithoutTimestamp() throws Exception {
@@ -103,6 +117,28 @@ public class StorageTest {
     @Test
     public void storage_missingFile_returnsEmptyTaskList() {
         TaskList restored = new Storage(temporaryDirectory.resolve("missing.txt")).loadTasks();
+
+        assertEquals(0, restored.size());
+    }
+
+    /** Verifies that a directory at the data-file location is treated as unreadable storage. */
+    @Test
+    public void storage_dataPathIsDirectory_returnsEmptyTaskList() throws Exception {
+        Path dataDirectory = temporaryDirectory.resolve("duchess.txt");
+        Files.createDirectory(dataDirectory);
+
+        TaskList restored = new Storage(dataDirectory).loadTasks();
+
+        assertEquals(0, restored.size());
+    }
+
+    /** Verifies that undecodable UTF-8 data cannot prevent startup. */
+    @Test
+    public void storage_invalidUtf8_returnsEmptyTaskList() throws Exception {
+        Path dataFile = temporaryDirectory.resolve("duchess.txt");
+        Files.write(dataFile, new byte[]{(byte) 0xC3, (byte) 0x28});
+
+        TaskList restored = new Storage(dataFile).loadTasks();
 
         assertEquals(0, restored.size());
     }
@@ -138,5 +174,75 @@ public class StorageTest {
         TaskList restored = storage.loadTasks();
         assertEquals(1, restored.size());
         assertEquals("keep", restored.get(0).getDescription());
+    }
+
+    /** Verifies every malformed record shape is skipped while valid adjacent data survives. */
+    @Test
+    public void storage_malformedRecordVariants_skipsAllInvalidRecords() throws Exception {
+        Path dataFile = temporaryDirectory.resolve("malformed.txt");
+        String description = encode("broken task");
+        String validDate = encode("2026-09-15");
+        String laterDate = encode("2026-09-17");
+        String[] records = {
+            "",
+            "T|0",
+            "X|0|" + description,
+            "T|2|" + description,
+            "T|0|%%%",
+            "T|0|" + encode("   "),
+            "T|0|" + description + "|extra|field",
+            "D|0|" + description,
+            "D|0|" + description + "|%%%",
+            "D|0|" + description + "|" + encode(" "),
+            "D|0|" + description + "|" + encode("2026-02-30"),
+            "E|0|" + description + "|%%%|" + laterDate + "|",
+            "E|0|" + description + "|" + validDate + "|%%%|",
+            "E|0|" + description + "|" + validDate + "|" + validDate + "|",
+            "E|0|" + description + "|%%%",
+            "E|0|" + description + "|" + encode(" "),
+            "E|0|" + description,
+            "T|0|" + encode("keep task")
+        };
+        Files.write(dataFile, java.util.List.of(records), StandardCharsets.UTF_8);
+
+        TaskList restored = new Storage(dataFile).loadTasks();
+
+        assertEquals(1, restored.size());
+        assertEquals("keep task", restored.get(0).getDescription());
+    }
+
+    /** Verifies malformed completion times preserve completion status without inventing a time. */
+    @Test
+    public void storage_invalidCompletionTimes_loadsCompletedTasksWithoutTimestamps() throws Exception {
+        Path dataFile = temporaryDirectory.resolve("completion-times.txt");
+        String[] records = {
+            "T|1|" + encode("todo") + "|%%%",
+            "D|1|" + encode("deadline") + "|" + encode("2026-09-30") + "|" + encode("not-an-instant"),
+            "E|1|" + encode("event") + "|" + encode("Monday") + "|"
+        };
+        Files.write(dataFile, java.util.List.of(records), StandardCharsets.UTF_8);
+
+        TaskList restored = new Storage(dataFile).loadTasks();
+
+        assertEquals(3, restored.size());
+        for (int index = 0; index < restored.size(); index++) {
+            assertTrue(restored.get(index).isDone());
+            assertNull(restored.get(index).getCompletedAt());
+        }
+    }
+
+    /** Verifies storage rejects null collaborators through its documented assertions. */
+    @Test
+    public void storage_nullInputs_throwAssertionError() {
+        assertAll(
+                () -> assertThrows(AssertionError.class, () -> new Storage(null)),
+                () -> assertThrows(AssertionError.class,
+                        () -> new Storage(temporaryDirectory.resolve("tasks.txt")).saveTasks(null))
+        );
+    }
+
+    /** Encodes one field using the storage file's Base64 convention. */
+    private String encode(String value) {
+        return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
     }
 }

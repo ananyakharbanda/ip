@@ -86,6 +86,14 @@ public class ParserTest {
                         + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
     }
 
+    /** Verifies that null input is treated as an empty command. */
+    @Test
+    public void parseTask_nullCommand_throwsDuchessException() {
+        assertParseTaskFailsWithMessage(null,
+                "OOPS!!! A command cannot be empty. "
+                        + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
+    }
+
     /** Verifies that a todo without a description is rejected. */
     @Test
     public void parseTask_todoWithoutDescription_throwsDuchessException() {
@@ -136,6 +144,13 @@ public class ParserTest {
     public void parseTask_eventWithoutDescription_throwsDuchessException() {
         assertParseTaskFailsWithMessage("event /at Monday",
                 "OOPS!!! The description of an event cannot be empty.");
+    }
+
+    /** Verifies that a legacy event cannot contain more than one time parameter. */
+    @Test
+    public void parseTask_eventWithDuplicateAtParameters_throwsDuchessException() {
+        assertParseTaskFailsWithMessage("event meeting /at Monday /at Tuesday",
+                "OOPS!!! An event must contain exactly one /at parameter.");
     }
 
     /** Verifies that embedded control characters cannot become task data. */
@@ -216,6 +231,29 @@ public class ParserTest {
         assertEquals(-1, Parser.parseTaskIndex("mark 2147483648", "mark "));
     }
 
+    /** Verifies that a number larger than a long is rejected safely. */
+    @Test
+    public void parseTaskIndex_largerThanLong_returnsMinusOne() {
+        assertEquals(-1, Parser.parseTaskIndex("mark 999999999999999999999999", "mark "));
+    }
+
+    /** Verifies that an otherwise valid number is rejected for the wrong command prefix. */
+    @Test
+    public void parseTaskIndex_wrongCommandPrefix_returnsMinusOne() {
+        assertEquals(-1, Parser.parseTaskIndex("delete 1", "mark "));
+    }
+
+    /** Verifies assertion-based preconditions for the task-index parser. */
+    @Test
+    public void parseTaskIndex_nullInput_throwsAssertionError() {
+        assertAll(
+                () -> assertThrows(AssertionError.class,
+                        () -> Parser.parseTaskIndex(null, "mark ")),
+                () -> assertThrows(AssertionError.class,
+                        () -> Parser.parseTaskIndex("mark 1", null))
+        );
+    }
+
     /** Verifies that the minimum integer cannot overflow into a valid task index. */
     @Test
     public void parseTaskIndex_minimumInteger_returnsMinusOne() {
@@ -244,6 +282,8 @@ public class ParserTest {
             "event meeting /from 2026-02-30 /to 2026-03-01",
             "event meeting /from 2026-09-17 /to 2026-09-15",
             "event meeting /from 2026-09-15 /to 2026-09-15",
+            "event meeting /to 2026-09-17 /from 2026-09-15",
+            "event meeting /from 2026-09-15 /to 2026-09-17 /at noon",
             "event meeting /from 2026-09-15 /from 2026-09-16 /to 2026-09-17",
             "event meeting /from 2026-09-15 /to 2026-09-17 /to 2026-09-18"
         };

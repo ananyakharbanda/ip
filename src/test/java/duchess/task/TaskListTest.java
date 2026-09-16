@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
@@ -55,6 +56,24 @@ public class TaskListTest {
                 () -> assertFalse(tasks.containsEquivalent(
                         new Deadline("submit report", "2026-10-01"))),
                 () -> assertFalse(tasks.containsEquivalent(new Event("meeting", "Tuesday 3pm")))
+        );
+    }
+
+    /** Verifies duplicate checks distinguish task types and structured event details. */
+    @Test
+    public void taskList_containsEquivalent_comparesEventFormsAndTypes() {
+        TaskList tasks = new TaskList(
+                new Todo("meeting"),
+                new Event("orientation", "2026-09-15", "2026-09-17"));
+
+        assertAll(
+                () -> assertFalse(tasks.containsEquivalent(new Event("meeting", "Monday"))),
+                () -> assertTrue(tasks.containsEquivalent(
+                        new Event("ORIENTATION", "2026-09-15", "2026-09-17"))),
+                () -> assertFalse(tasks.containsEquivalent(
+                        new Event("orientation", "2026-09-15", "2026-09-18"))),
+                () -> assertFalse(tasks.containsEquivalent(new Event("orientation", "Monday"))),
+                () -> assertFalse(tasks.containsEquivalent(new Todo("different description")))
         );
     }
 
@@ -128,6 +147,24 @@ public class TaskListTest {
         );
     }
 
+    /** Verifies that both ends of the seven-day window are inclusive and future times are excluded. */
+    @Test
+    public void taskList_getStatistics_includesBoundariesAndExcludesFutureCompletion() {
+        Instant now = Instant.parse("2026-09-11T00:00:00Z");
+        Task periodStartTask = new Todo("period start");
+        periodStartTask.markAsDone(Instant.parse("2026-09-04T00:00:00Z"));
+        Task periodEndTask = new Todo("period end");
+        periodEndTask.markAsDone(now);
+        Task futureTask = new Todo("future");
+        futureTask.markAsDone(Instant.parse("2026-09-11T00:00:01Z"));
+        TaskList tasks = new TaskList(periodStartTask, periodEndTask, futureTask);
+
+        TaskStatistics statistics = tasks.getStatistics(now);
+
+        assertEquals(3, statistics.getCompletedTasks());
+        assertEquals(2, statistics.getRecentlyCompletedTasks());
+    }
+
     /** Verifies that an unknown completion time is excluded from recent statistics. */
     @Test
     public void taskList_getStatistics_excludesCompletedTasksWithoutTimestamp() {
@@ -190,6 +227,24 @@ public class TaskListTest {
                 () -> assertEquals(2, matchingTasks.size()),
                 () -> assertSame(first, matchingTasks.get(0)),
                 () -> assertSame(second, matchingTasks.get(1))
+        );
+    }
+
+    /** Verifies assertion-based preconditions for invalid internal calls. */
+    @Test
+    public void taskList_invalidInternalInputs_throwAssertionError() {
+        TaskList tasks = new TaskList(new Todo("only task"));
+
+        assertAll(
+                () -> assertThrows(AssertionError.class, () -> new TaskList((Task[]) null)),
+                () -> assertThrows(AssertionError.class, () -> tasks.add(null)),
+                () -> assertThrows(AssertionError.class, () -> tasks.containsEquivalent(null)),
+                () -> assertThrows(AssertionError.class, () -> tasks.get(-1)),
+                () -> assertThrows(AssertionError.class, () -> tasks.delete(1)),
+                () -> assertThrows(AssertionError.class, () -> tasks.markAsDone(1)),
+                () -> assertThrows(AssertionError.class, () -> tasks.markAsDone(0, null)),
+                () -> assertThrows(AssertionError.class, () -> tasks.markAsNotDone(1)),
+                () -> assertThrows(AssertionError.class, () -> tasks.getStatistics(null))
         );
     }
 }
