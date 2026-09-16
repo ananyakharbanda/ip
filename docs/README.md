@@ -1,5 +1,7 @@
 # Duchess User Guide
 
+![Duchess GUI showing a realistic task roster and completion statistics](Ui.png)
+
 Duchess is a task manager with an original squad-room personality. She keeps
 responses quick-witted, supportive, and lightly deadpan while helping users
 manage todos, deadlines, events, searches, and completion statistics. The same
