@@ -24,4 +24,10 @@ public class DeadlineTest {
     public void deadline_invalidDate_throwsDateParseException() {
         assertThrows(DateTimeParseException.class, () -> new Deadline("return book", "not-a-date"));
     }
+
+    /** Verifies that a null date violates the deadline constructor precondition. */
+    @Test
+    public void deadline_nullDate_throwsAssertionError() {
+        assertThrows(AssertionError.class, () -> new Deadline("return book", null));
+    }
 }

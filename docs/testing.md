@@ -8,7 +8,12 @@ Run the full build checks with the Gradle wrapper:
 ./gradlew check
 ```
 
-This compiles the project, runs the JUnit suite, and runs Checkstyle. The
+This compiles the project, runs the JUnit suite, runs Checkstyle, and generates
+the JaCoCo report at `build/reports/jacoco/test/html/index.html`. The coverage
+figure excludes `duchess.gui` because those JavaFX controls require a graphical
+toolkit; the console and shared command-processing code remain included. The
+build requires at least 98% line coverage and 90% branch coverage for that
+headless core. The current report records the exact measured values. The
 equivalent project-owned wrappers are:
 
 ```text
@@ -27,6 +32,8 @@ selected in the environment, so configure Java 25 before running them.
 - `StorageTest` checks round trips, malformed records, legacy records, and
   missing files using temporary paths.
 - `DuchessTest` checks the response boundary shared by the CLI and GUI.
+- `DuchessMainTest` and `UiTest` check the CLI entry point and console streams.
+- `GuiResourceTest` checks that every referenced FXML and CSS resource is packaged.
 - `test/ui-test-plan.md` checks complete user sessions and exact console output.
 
 Run the UI plan with:
@@ -43,3 +50,9 @@ Tests prioritize state transitions, persistence boundaries, invalid input, and
 derived statistics because failures in these areas affect multiple user-facing
 commands. The UI plan remains an end-to-end safety net for exact output and
 startup data loading.
+
+## Manual JavaFX checks
+
+JavaFX rendering, focus, resizing, and platform appearance require a graphical
+desktop and are intentionally excluded from the headless JaCoCo measurement.
+Follow `test/manual-test-plan.md` before a release or a major GUI change.

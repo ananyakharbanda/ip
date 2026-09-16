@@ -3,6 +3,8 @@ plugins {
     id 'application'
     // Adds checkstyleMain and checkstyleTest tasks for the SE-EDU style rules.
     id 'checkstyle'
+    // Generates measurable coverage for the non-GUI code exercised by JUnit.
+    id 'jacoco'
     id 'com.gradleup.shadow' version '9.5.1'
 }
 

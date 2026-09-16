@@ -1,6 +1,7 @@
 package duchess.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
@@ -16,6 +17,8 @@ public class EventTest {
         Event event = new Event("buy bread", "Saturday");
 
         assertEquals("Saturday", event.getAt());
+        assertNull(event.getFrom());
+        assertNull(event.getTo());
         assertEquals("[E][ ] buy bread (at: Saturday)", event.toString());
     }
     /** Verifies actual date storage and a human-readable range. */
@@ -24,6 +27,7 @@ public class EventTest {
         Event event = new Event("orientation", "2026-09-15", "2026-09-17");
         assertEquals(LocalDate.of(2026, 9, 15), event.getFrom());
         assertEquals(LocalDate.of(2026, 9, 17), event.getTo());
+        assertNull(event.getAt());
         assertEquals("[E][ ] orientation (from: Sep 15 2026 to: Sep 17 2026)", event.toString());
     }
 
@@ -36,5 +40,12 @@ public class EventTest {
                 () -> new Event("meeting", "2026-09-17", "2026-09-15"));
         assertThrows(IllegalArgumentException.class,
                 () -> new Event("meeting", "2026-09-15", "2026-09-15"));
+    }
+
+    /** Verifies assertion-based preconditions for legacy event times. */
+    @Test
+    public void event_invalidLegacyTime_throwsAssertionError() {
+        assertThrows(AssertionError.class, () -> new Event("meeting", (String) null));
+        assertThrows(AssertionError.class, () -> new Event("meeting", "   "));
     }
 }
