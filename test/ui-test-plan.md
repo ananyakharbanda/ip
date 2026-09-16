@@ -5,6 +5,21 @@ into a temporary directory before starting each test case in a fresh process.
 
 Run command: `java -cp {classes} duchess.Duchess`
 
+## Manual GUI check: Speaker profile icons
+
+Aim: Verify the graphical message layout, which the console runner cannot inspect.
+
+Start the GUI and enter `todo prepare demo slides`, `list`, and `help`.
+Confirm the teal theme, `Duchess ✦ Squad Task Desk` window title, and the
+`Check roster`, `New case`, and `Find clue` shortcuts are present.
+Each Duchess message, including the greeting, should show a navy shield with a
+coral star on its left. Each user message should show a teal shield with a light
+person symbol on its right. Both badges should be 48 pixels across, clearly
+larger than the previous 32-pixel profile icons.
+Check that long responses wrap without overlapping either icon and that the
+command box remains usable when the window is narrowed to its minimum width.
+Command text and responses should match the console cases below.
+
 ## Test case 1: Create and mark multiple task types
 
 Aim: Verify that `todo`, `deadline`, and `event` commands create different

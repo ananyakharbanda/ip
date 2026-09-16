@@ -1,5 +1,31 @@
 .dialog-row {
     -fx-padding: 5px 2px;
+    -fx-spacing: 8px;
+    -fx-alignment: TOP_LEFT;
+}
+
+.avatar {
+    -fx-translate-y: 15px;
+}
+
+.avatar-shield {
+    -fx-fill: #193751;
+    -fx-stroke: #f3a076;
+    -fx-stroke-width: 1.5px;
+}
+
+.avatar-icon {
+    -fx-fill: #f3a076;
+    -fx-translate-y: -3px;
+}
+
+.user-row .avatar-shield {
+    -fx-fill: #147d8f;
+    -fx-stroke: #95cbd2;
+}
+
+.user-row .avatar-icon {
+    -fx-fill: #f2faf9;
 }
 
 .speaker-label {
