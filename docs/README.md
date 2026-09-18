@@ -3,7 +3,7 @@
 Duchess is your squad task partner: a desktop chatbot that helps you organise
 things to do, track deadlines and events, and see your progress.
 
-<img src="Ui.png" alt="Duchess showing a task roster and completion statistics" width="400">
+<img src="Ui.png" alt="Duchess showing task entry in the redesigned desktop interface" width="640">
 
 [Quick start](#quick-start) · [Features](#features) · [Saving and recovery](#saving-and-recovery)
 
@@ -63,8 +63,8 @@ Here are the tasks in your list:
 Example: `find proposal` finds tasks whose descriptions contain `proposal`.
 Search is case-insensitive and matches part of a word. Multiple words are
 searched as one phrase, so `find team meeting` looks for that phrase.
-Dates and event times are not searched. If nothing matches, only the results
-heading appears.
+Dates and event times are not searched. If nothing matches, Duchess displays “No matching tasks found” and suggests
+trying a different keyword.
 
 Search results retain the numbers from `list`. If a result is numbered `3`,
 use `mark 3` to complete it, even if it is the only search result.
@@ -100,15 +100,33 @@ completion timestamp count toward completed tasks, but not the seven-day count.
 
 ### Get help or exit
 
-Enter `help` to see the command playbook. Enter `bye` to close Duchess.
+Enter `help` to see the command playbook. Enter `bye` to close Duchess after a two-second farewell.
 `list`, `stats`, `help`, and `bye` take no extra arguments.
 
 ### Use GUI shortcuts
 
-- **Check roster** runs `list`.
-- **New case** fills in `todo `; add a description and submit it.
-- **Find clue** fills in `find `; add your search text and submit it.
-- **Help** displays the command playbook in the conversation.
+All eleven commands are available in **Squad shortcuts**. Hover over a shortcut
+for its command format; the squad aliases continue to work when typed.
+
+| Shortcut | Command | Behavior |
+| --- | --- | --- |
+| New case | `todo` | Prepare a new todo |
+| Deadline | `deadline` | Prepare a deadline; add a description and `/by DATE` |
+| Briefing | `event` | Prepare an event; add `/at TIME` or `/from DATE /to DATE` |
+| Roll call | `list` | Show the task roster |
+| Find intel | `find` | Prepare a keyword search |
+| Close case | `mark` | Prepare to complete a numbered task |
+| Reopen | `unmark` | Prepare to reopen a numbered task |
+| Archive | `delete` | Prepare to delete a numbered task; no deletion until submitted |
+| Report | `stats` | Show completion statistics |
+| Playbook | `help` | Show the command guide |
+| Sign off | `bye` | Show the farewell and exit after two seconds |
+
+The header Help button also opens the playbook. Shortcuts needing arguments
+fill the command box and focus it so you can finish the command before sending.
+
+Long commands wrap in the input box. Blank submissions are ignored. Text grows
+slightly with wider windows, while the conversation keeps a readable width.
 
 ### Squad aliases
 

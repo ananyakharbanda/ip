@@ -1,9 +1,11 @@
 package duchess.gui;
 
 import duchess.Duchess;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /** Controller for the main Duchess chat window. */
 public class MainWindow extends VBox {
@@ -26,9 +28,7 @@ public class MainWindow extends VBox {
     @FXML
     public void initialize() {
         header.setHelpAction(this::handleHelp);
-        quickCommands.setListAction(this::handleList);
-        quickCommands.setTodoAction(this::handleTodo);
-        quickCommands.setFindAction(this::handleFind);
+        quickCommands.setCommandAction(this::handleQuickCommand);
         composer.setSubmitAction(this::handleUserInput);
     }
 
@@ -40,8 +40,10 @@ public class MainWindow extends VBox {
     public void setDuchess(Duchess duchess) {
         this.duchess = duchess;
         conversationView.addDialogs(
-                DialogBox.getDuchessDialog("👋 Hey, squad! I'm Duchess, your precinct task partner.\n\n"
-                                + "Give me your next case, or open Help for the playbook.", "welcome"));
+                DialogBox.getDuchessDialog("Nine-Nine! Your task squad is on duty.\n\n"
+                                + "I’m Duchess, your precinct task partner. Bring me a case;\n"
+                                + "I’ll keep the paperwork under control. Cool cool cool.\n\n"
+                                + "Start with New case, or open the Playbook for a briefing.", "welcome"));
         if (!duchess.getStartupWarning().isEmpty()) {
             conversationView.addDialogs(DialogBox.getDuchessDialog(duchess.getStartupWarning(), "error"));
             updateStatus("error");
@@ -59,23 +61,19 @@ public class MainWindow extends VBox {
         submitCommand("help");
     }
 
-    /** Shows the current task list from the quick-command strip. */
-    private void handleList() {
-        submitCommand("list");
-    }
-
-    /** Places a todo command starter in the composer for quick task entry. */
-    private void handleTodo() {
-        prepareCommand("todo ");
-    }
-
-    /** Places a find command starter in the composer for quick searching. */
-    private void handleFind() {
-        prepareCommand("find ");
+    /** Runs read-only shortcuts immediately and prepares commands that need task details. */
+    private void handleQuickCommand(String command) {
+        switch (command) {
+            case "list", "stats", "help", "bye" -> submitCommand(command);
+            default -> prepareCommand(command + " ");
+        }
     }
 
     /** Sends a command through the shared processor and appends the conversation bubbles. */
     private void submitCommand(String input) {
+        if (input.isBlank() || duchess.isExitRequested()) {
+            return;
+        }
         String response = duchess.getResponse(input);
         String commandType = duchess.getCommandType();
 
@@ -84,12 +82,15 @@ public class MainWindow extends VBox {
                 DialogBox.getDuchessDialog(response, commandType));
         updateStatus(commandType);
         composer.clearInput();
+        composer.requestInputFocus();
 
         if (duchess.isExitRequested()) {
             composer.setInputDisabled(true);
             header.setHelpDisabled(true);
             quickCommands.setDisable(true);
-            Platform.exit();
+            PauseTransition farewellPause = new PauseTransition(Duration.seconds(2));
+            farewellPause.setOnFinished(event -> Platform.exit());
+            farewellPause.play();
         }
     }
 
@@ -102,22 +103,22 @@ public class MainWindow extends VBox {
     private void updateStatus(String commandType) {
         switch (commandType) {
             case "add", "mark", "unmark" -> {
-                header.updateStatus("✦ Squad updated", "status-success");
+                header.updateStatus("★ Squad updated. Noice.", "status-success");
             }
             case "delete" -> {
-                header.updateStatus("✦ Record removed", "status-success");
+                header.updateStatus("★ Case archived", "status-success");
             }
             case "error" -> {
-                header.updateStatus("! Check command", "status-warning");
+                header.updateStatus("Hold up, detective. Check that command.", "status-warning");
             }
             case "bye" -> {
-                header.updateStatus("✦ See you soon", "status-muted");
+                header.updateStatus("Nine-Nine! Signing off…", "status-muted");
             }
             case "help" -> {
-                header.updateStatus("✦ Guide open", "status-ready");
+                header.updateStatus("★ The squad playbook", "status-ready");
             }
             default -> {
-                header.updateStatus("✦ Squad ready", "status-ready");
+                header.updateStatus("★ Squad ready. Let’s solve this.", "status-ready");
             }
         }
     }

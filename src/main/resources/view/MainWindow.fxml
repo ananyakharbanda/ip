@@ -7,7 +7,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="680.0" prefWidth="520.0" minHeight="560.0" minWidth="420.0" spacing="0.0"
+<VBox prefHeight="680.0" prefWidth="520.0" minHeight="560.0" minWidth="420.0" spacing="0.0" alignment="TOP_CENTER"
       xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="duchess.gui.MainWindow"

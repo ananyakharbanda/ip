@@ -29,9 +29,14 @@ Steps:
 
 1. Launch Duchess and type in the composer immediately.
 2. Submit with Enter and confirm the input clears and regains focus.
-3. Select the Todo and Find quick commands and verify their command starters
-   and caret positions.
-4. Select Help and List and verify their dialogs and header statuses.
+3. Select New case, Deadline, Briefing, Find intel, Close case, Reopen, and
+   Archive; verify each command starter and caret position. Archive must not
+   delete anything until a task number is entered and the command submitted.
+4. Select Roll call, Report, and Playbook; verify their responses and statuses.
+5. Hover over shortcuts and check their command-format tooltips. Confirm all
+   eleven shortcuts remain accessible at minimum window size, with no overlap.
+6. Confirm the navy-and-gold header badge, full-size shield avatars, and
+   Nine-Nine greeting remain visible.
 
 Expected: Focus, caret placement, submission, and every shortcut work without
 duplicate dialogs or disabled controls.
@@ -59,7 +64,7 @@ Steps:
 1. Launch Duchess and enter `bye`.
 2. Confirm the goodbye dialog and muted header status appear.
 3. Confirm the composer, Help button, and quick commands become disabled and
-   the JavaFX application exits without an exception.
+   the farewell remains visible for about two seconds before the app exits.
 
 Expected: No additional command can be submitted after exit is requested.
 
@@ -94,3 +99,21 @@ Steps:
 Expected: The application launches through the platform script, Unicode text
 round-trips through storage, icons have readable fallbacks, and dates retain
 the documented Duchess format on every locale.
+
+## Test case 7: Blank submission and long input regression
+
+Aim: Prevent empty Enter repeats from flooding the conversation (forum #286).
+
+Steps:
+
+1. Hold Enter for five seconds with an empty composer, then repeat with spaces.
+2. Verify no messages appear and Send is disabled.
+3. Paste a long todo command and confirm it wraps in the composer at minimum width.
+4. Submit with Enter and confirm exactly one task is added and input clears.
+5. Repeat with the Send button; try pasting text containing line breaks.
+6. Run `find nonexistent-keyword` and confirm the explicit no-matches response.
+7. Maximize the window and confirm text grows and the conversation stays centered,
+   with a maximum width of 880 pixels. Return to minimum size and open Help.
+
+Expected: Input remains responsive, long text wraps without horizontal clipping,
+line breaks in pasted commands become spaces, and blank commands produce no dialogs.

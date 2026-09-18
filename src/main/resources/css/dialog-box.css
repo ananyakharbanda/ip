@@ -1,120 +1,40 @@
-.dialog-row {
-    -fx-padding: 5px 2px;
-    -fx-spacing: 8px;
-    -fx-alignment: TOP_LEFT;
-}
-
-.avatar {
-    -fx-translate-y: 15px;
-}
-
-.avatar-shield {
-    -fx-fill: #193751;
-    -fx-stroke: #f3a076;
-    -fx-stroke-width: 1.5px;
-}
-
-.avatar-icon {
-    -fx-fill: #f3a076;
-    -fx-translate-y: -3px;
-}
-
-.user-row .avatar-shield {
-    -fx-fill: #147d8f;
-    -fx-stroke: #95cbd2;
-}
-
-.user-row .avatar-icon {
-    -fx-fill: #f2faf9;
-}
-
+.dialog-row { -fx-padding: 10px 0; -fx-spacing: 10px; -fx-alignment: TOP_LEFT; }
+.avatar { -fx-translate-y: 17px;  }
+.avatar-shield { -fx-fill: #20364e; -fx-stroke: #dfa960; -fx-stroke-width: 1.5px; }
+.avatar-icon { -fx-fill: #f0bd75; -fx-translate-y: -3px; }
+.user-row .avatar-shield { -fx-fill: #176b60; -fx-stroke: #98c7b9; }
+.user-row .avatar-icon { -fx-fill: #f0f8f4; }
 .speaker-label {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-effect: null;
-    -fx-padding: 0 10px;
-    -fx-font-size: 9px;
+    -fx-padding: 0 2px 4px 2px;
+    -fx-font-size: 0.68em;
     -fx-font-weight: bold;
-    -fx-background-insets: 0;
-    -fx-border-insets: 0;
+    -fx-text-fill: #627a70;
 }
-
-.user-row {
-    -fx-alignment: TOP_RIGHT;
-    -fx-padding: 3px 2px 3px 64px;
-}
-
-.user-row .message-column {
-    -fx-alignment: CENTER_RIGHT;
-}
-
-.user-row .speaker-label {
-    -fx-text-fill: #56717b;
-    -fx-alignment: CENTER_RIGHT;
-}
-
+.user-row { -fx-alignment: TOP_RIGHT; -fx-padding: 6px 0 6px 40px; }
+.user-row .message-column { -fx-alignment: CENTER_RIGHT; }
+.user-row .speaker-label { -fx-alignment: CENTER_RIGHT; }
 .dialog-label {
-    -fx-background-color: #fffdf8;
-    -fx-border-color: #e1d9cb;
-    -fx-border-width: 1px;
-    -fx-background-radius: 12px 12px 12px 3px;
-    -fx-border-radius: 12px 12px 12px 3px;
-    -fx-padding: 9px 12px;
-    -fx-text-fill: #2e3545;
-    -fx-font-family: "System";
-    -fx-font-size: 13px;
-    -fx-font-style: normal;
-    -fx-font-weight: normal;
-    -fx-line-spacing: 2px;
-    -fx-effect: dropshadow(gaussian, rgba(53, 43, 74, 0.08), 7, 0.12, 0, 1);
+    -fx-background-color: white;
+    -fx-border-color: #e1e9e5;
+    -fx-background-radius: 3px 14px 14px 14px;
+    -fx-border-radius: 3px 14px 14px 14px;
+    -fx-padding: 14px 16px;
+    -fx-text-fill: #2c443b;
+    -fx-font-size: 1em;
+    -fx-line-spacing: 4px;
 }
-
 .user-row .dialog-label {
-    -fx-background-color: #d9eef0;
-    -fx-border-color: #9dcdd1;
-    -fx-background-radius: 12px 12px 3px 12px;
-    -fx-border-radius: 12px 12px 3px 12px;
-    -fx-text-fill: #214254;
+    -fx-background-color: #e5f0eb;
+    -fx-border-color: #d8e7df;
+    -fx-background-radius: 14px 3px 14px 14px;
+    -fx-border-radius: 14px 3px 14px 14px;
 }
-
-.duchess-row .speaker-label {
-    -fx-text-fill: #28707a;
-}
-
-.duchess-row .dialog-label {
-    -fx-background-color: linear-gradient(to bottom right, #ffffff, #eaf5f5);
-    -fx-border-color: #b8d9da;
-}
-
-.duchess-row .add-label {
-    -fx-background-color: #fff5ce;
-    -fx-border-color: #e8cc79;
-}
-
-.duchess-row .marked-label {
-    -fx-background-color: #e9f7ed;
-    -fx-border-color: #b6ddc2;
-}
-
-.duchess-row .delete-label {
-    -fx-background-color: #fff0ed;
-    -fx-border-color: #efc0b4;
-}
-
-.error-row {
-    -fx-padding: 5px 2px 8px 2px;
-}
-
-.error-row .speaker-label {
-    -fx-text-fill: #b23a43;
-}
-
+.duchess-row .add-label { -fx-background-color: #f5f5e9; -fx-border-color: #e3e6cd; }
+.duchess-row .marked-label { -fx-background-color: #edf6ef; -fx-border-color: #d7e8da; }
+.duchess-row .delete-label { -fx-background-color: #fcf2ea; -fx-border-color: #eddfd2; }
+.error-row .speaker-label { -fx-text-fill: #a13f3f; }
 .duchess-row .error-label {
-    -fx-background-color: #fff0f0;
-    -fx-border-color: #e2a0a5;
-    -fx-border-width: 1px 1px 1px 4px;
-    -fx-background-radius: 4px 12px 12px 4px;
-    -fx-border-radius: 4px 12px 12px 4px;
-    -fx-text-fill: #812c35;
-    -fx-effect: dropshadow(gaussian, rgba(174, 59, 68, 0.14), 8, 0.18, 0, 2);
+    -fx-background-color: #fff2f0;
+    -fx-border-color: #e7bdb8;
+    -fx-text-fill: #903d35;
 }

@@ -288,7 +288,7 @@ public class DuchessTest {
         assertAll(
                 () -> assertEquals("OOPS!!! Please use 'find <keyword>', for example: find book.",
                         missingKeywordResponse),
-                () -> assertEquals("Here are the matching tasks in your list:", unmatchedKeywordResponse)
+                () -> assertEquals("No matching tasks found. Try a different keyword.", unmatchedKeywordResponse)
         );
     }
 

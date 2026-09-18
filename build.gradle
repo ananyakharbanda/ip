@@ -71,3 +71,19 @@ run {
 
 // Keep quality and test-reporting conventions in a reusable Gradle script.
 apply from: 'gradle/quality.gradle'
+
+// Opt-in integration check: requires a real display and uses disposable task data.
+tasks.register('guiTest', Test) {
+    description = 'Checks JavaFX input and layout regressions on a graphical desktop.'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    filter { includeTestsMatching 'duchess.gui.GuiInteractionTest' }
+    jacoco.enabled = false
+    systemProperty 'duchess.guiTests', 'true'
+    systemProperty 'duchess.preview', layout.buildDirectory.file('reports/gui-preview.png').get().asFile.path
+    doFirst {
+        workingDir = java.nio.file.Files.createTempDirectory('duchess-gui-test').toFile()
+    }
+}

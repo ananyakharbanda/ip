@@ -1,21 +1,18 @@
 package duchess.gui;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.layout.FlowPane;
 
 /** A reusable JavaFX strip containing shortcuts for common Duchess commands. */
 public class QuickCommands extends FlowPane {
-    /** Action to run when the list shortcut is pressed. */
-    private Runnable listAction = () -> { };
-
-    /** Action to run when the todo shortcut is pressed. */
-    private Runnable todoAction = () -> { };
-
-    /** Action to run when the find shortcut is pressed. */
-    private Runnable findAction = () -> { };
+    /** Receives the canonical command selected from the squad shortcuts. */
+    private Consumer<String> commandAction = command -> { };
 
     /** Loads the quick-command layout from its FXML view. */
     public QuickCommands() {
@@ -29,48 +26,19 @@ public class QuickCommands extends FlowPane {
         }
     }
 
-    /** Runs the configured list action when the FXML shortcut is pressed. */
+    /** Sends the selected shortcut's canonical command to the main controller. */
     @FXML
-    private void handleList() {
-        listAction.run();
-    }
-
-    /** Runs the configured todo action when the FXML shortcut is pressed. */
-    @FXML
-    private void handleTodo() {
-        todoAction.run();
-    }
-
-    /** Runs the configured find action when the FXML shortcut is pressed. */
-    @FXML
-    private void handleFind() {
-        findAction.run();
+    private void handleCommand(ActionEvent event) {
+        Button button = (Button) event.getSource();
+        commandAction.accept((String) button.getUserData());
     }
 
     /**
-     * Sets the action to run for the list shortcut.
+     * Sets the action to run when any squad shortcut is selected.
      *
-     * @param listAction the action to run
+     * @param commandAction the action receiving the selected command name
      */
-    public void setListAction(Runnable listAction) {
-        this.listAction = listAction;
-    }
-
-    /**
-     * Sets the action to run for the todo shortcut.
-     *
-     * @param todoAction the action to run
-     */
-    public void setTodoAction(Runnable todoAction) {
-        this.todoAction = todoAction;
-    }
-
-    /**
-     * Sets the action to run for the find shortcut.
-     *
-     * @param findAction the action to run
-     */
-    public void setFindAction(Runnable findAction) {
-        this.findAction = findAction;
+    public void setCommandAction(Consumer<String> commandAction) {
+        this.commandAction = commandAction;
     }
 }

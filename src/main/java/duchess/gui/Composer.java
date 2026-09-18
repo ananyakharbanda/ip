@@ -2,16 +2,19 @@ package duchess.gui;
 
 import java.io.IOException;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 
 /** A reusable JavaFX input composer containing the command field and Send button. */
 public class Composer extends HBox {
     @FXML
-    private TextField userInput;
+    private TextArea userInput;
 
     @FXML
     private Button sendButton;
@@ -31,10 +34,25 @@ public class Composer extends HBox {
         }
     }
 
+    /** Ignores empty submissions and keeps long commands wrapped in the editor. */
+    @FXML
+    public void initialize() {
+        sendButton.disableProperty().bind(Bindings.createBooleanBinding(
+                () -> userInput.getText().isBlank(), userInput.textProperty()));
+        userInput.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                event.consume();
+                handleSubmit();
+            }
+        });
+    }
+
     /** Runs the configured submit action when the FXML composer is submitted. */
     @FXML
     private void handleSubmit() {
-        submitAction.run();
+        if (!userInput.isDisabled() && !userInput.getText().isBlank()) {
+            submitAction.run();
+        }
     }
 
     /**
@@ -52,7 +70,7 @@ public class Composer extends HBox {
      * @return the current command text
      */
     public String getInput() {
-        return userInput.getText();
+        return userInput.getText().replaceAll("\\R", " ");
     }
 
     /** Clears the command field. */
@@ -78,7 +96,7 @@ public class Composer extends HBox {
      */
     public void setInputDisabled(boolean disabled) {
         userInput.setDisable(disabled);
-        sendButton.setDisable(disabled);
+        setDisable(disabled);
     }
 
     /** Gives keyboard focus to the command field. */

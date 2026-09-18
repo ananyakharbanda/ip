@@ -17,7 +17,7 @@ public class DialogBox extends HBox {
     @FXML
     private Label speakerLabel;
 
-    /** Displays the speaker's squad badge beside the message. */
+    /** Displays the speaker's profile icon beside the message. */
     @FXML
     private StackPane avatarPane;
 
@@ -39,7 +39,7 @@ public class DialogBox extends HBox {
 
         dialog.setText(text);
         speakerLabel.setText(speaker);
-        avatarPane.setAccessibleText(speaker + " squad badge");
+        avatarPane.setAccessibleText(speaker + " profile icon");
     }
 
     /**

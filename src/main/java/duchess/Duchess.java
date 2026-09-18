@@ -247,7 +247,7 @@ public class Duchess {
                 .mapToObj(index -> (index + 1) + "." + tasks.get(index))
                 .collect(Collectors.joining("\n"));
         String heading = "Here are the matching tasks in your list:";
-        return matches.isEmpty() ? heading : heading + "\n" + matches;
+        return matches.isEmpty() ? "No matching tasks found. Try a different keyword." : heading + "\n" + matches;
     }
 
     /** Returns the response to a mark command. */

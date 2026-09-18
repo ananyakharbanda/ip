@@ -56,3 +56,12 @@ startup data loading.
 JavaFX rendering, focus, resizing, and platform appearance require a graphical
 desktop and are intentionally excluded from the headless JaCoCo measurement.
 Follow `test/manual-test-plan.md` before a release or a major GUI change.
+
+## Graphical regression check
+
+On a desktop with Java 25, run `./gradlew guiTest` to exercise blank Enter
+repeats, whitespace-only submissions, wrapping, pasted line breaks, search
+feedback, narrow/wide layouts, and the disabled farewell state. It uses an
+isolated temporary data directory. The ordinary headless `test` task skips
+this display-dependent test. Inspect `build/reports/gui-preview.png` for the
+rendered scene; continue to use the manual plan for platform smoke testing.

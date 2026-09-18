@@ -12,10 +12,10 @@ import javafx.stage.Stage;
 /** The JavaFX application that hosts Duchess's chat window. */
 public class Main extends Application {
     /** The initial width of the chat window. */
-    private static final double WINDOW_WIDTH = 520.0;
+    private static final double WINDOW_WIDTH = 720.0;
 
     /** The initial height of the chat window. */
-    private static final double WINDOW_HEIGHT = 680.0;
+    private static final double WINDOW_HEIGHT = 780.0;
 
     /** The smallest width that keeps the command composer usable. */
     private static final double MIN_WINDOW_WIDTH = 420.0;
@@ -40,6 +40,10 @@ public class Main extends Application {
             controller.setDuchess(new Duchess());
 
             stage.setTitle("Duchess ✦ Squad Task Desk");
+            scene.widthProperty().addListener((observable, oldWidth, newWidth) -> {
+                double fontSize = Math.clamp(newWidth.doubleValue() / 50, 14, 18);
+                root.setStyle("-fx-font-size: " + fontSize + "px;");
+            });
             stage.setMinWidth(MIN_WINDOW_WIDTH);
             stage.setMinHeight(MIN_WINDOW_HEIGHT);
             stage.setResizable(true);
