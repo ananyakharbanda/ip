@@ -89,8 +89,8 @@ public class UiTest {
         System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
     }
 
-    /** Returns all text written to the captured standard output. */
+    /** Returns captured text with Windows line endings normalized for portable assertions. */
     private String output() {
-        return capturedOutput.toString(StandardCharsets.UTF_8);
+        return capturedOutput.toString(StandardCharsets.UTF_8).replace("\r\n", "\n");
     }
 }
